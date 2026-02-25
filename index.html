@@ -47,8 +47,8 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 10px 16px 6px;
-      gap: 7px;
+      padding: 8px 16px 4px;
+      gap: 5px;
       user-select: none;
     }
 
@@ -66,12 +66,12 @@
     /* ── Top bar ── */
     .top-bar {
       width: 100%; max-width: 920px;
-      display: flex; flex-direction: column; gap: 6px; flex-shrink: 0;
+      display: flex; flex-direction: column; gap: 4px; flex-shrink: 0;
       background: rgba(255,255,255,.55);
-      border-radius: 20px; padding: 8px 14px;
+      border-radius: 16px; padding: 5px 12px;
       border: 2px solid rgba(255,255,255,.7);
       backdrop-filter: blur(8px);
-      margin-top: 6px;
+      margin-top: 4px;
       box-shadow: 0 2px 12px rgba(0,0,0,.10);
     }
     .top-row1 { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; }
@@ -79,7 +79,7 @@
 
     header { text-align: center; }
     header h1 {
-      font-size: clamp(1rem, 2.8vw, 1.55rem);
+      font-size: clamp(.95rem, 2.4vw, 1.3rem);
       color: #4a2c00;
       font-family: var(--font-zh);
       letter-spacing: .06em;
@@ -91,8 +91,8 @@
     /* ── Buttons — chunky Joy-Con pill style ── */
     .controls { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
     .btn {
-      padding: 9px 22px; border: none; border-radius: 50px;
-      font-size: 1rem; font-weight: 900; cursor: pointer; font-family: var(--font-en);
+      padding: 7px 18px; border: none; border-radius: 50px;
+      font-size: .9rem; font-weight: 900; cursor: pointer; font-family: var(--font-en);
       letter-spacing: .03em;
       transition: transform .1s, box-shadow .1s, filter .1s;
       box-shadow: 0 2px 6px rgba(0,0,0,.18);
@@ -112,9 +112,9 @@
 
     /* ── Scoreboard ── */
     .scoreboard {
-      display: flex; gap: 14px; font-size: 1rem; font-weight: 800;
+      display: flex; gap: 12px; font-size: .9rem; font-weight: 800;
       color: #4a2c00;
-      background: rgba(255,255,255,.65); padding: 5px 16px; border-radius: 50px;
+      background: rgba(255,255,255,.65); padding: 4px 14px; border-radius: 50px;
       border: 2px solid rgba(255,255,255,.8);
       backdrop-filter: blur(4px);
     }
@@ -218,7 +218,7 @@
     .progress-wrap {
       width: 100%; max-width: 920px;
       background: rgba(255,255,255,.45);
-      border-radius: 50px; height: 10px; flex-shrink: 0; overflow: hidden;
+      border-radius: 50px; height: 7px; flex-shrink: 0; overflow: hidden;
       border: 1.5px solid rgba(255,255,255,.6);
     }
     .progress-bar {
@@ -383,21 +383,32 @@
 
     /* ── Responsive ── */
     @media (max-width: 768px) {
-      body         { padding: 6px 8px 4px; gap: 4px; }
-      .top-bar     { gap: 4px; padding: 6px 10px; }
-      .top-row1, .top-row2 { gap: 6px; }
+      body::before, body::after { height: 6px; }
+      body         { padding: 4px 6px 3px; gap: 3px; }
+      .top-bar     { gap: 3px; padding: 4px 8px; border-radius: 14px; margin-top: 3px; }
+      .top-row1, .top-row2 { gap: 5px; }
+      /* collapse both rows tighter */
+      .top-row1    { flex-wrap: nowrap; justify-content: space-between; }
+      .top-row2    { flex-wrap: nowrap; justify-content: center; }
       .columns     { gap: 10px; padding: 4px; }
       .match-card  { padding: 2px 5px; border-radius: 12px; }
-      .card-pinyin { font-size: clamp(.65rem, 1.7vh, 1rem); }
-      .card-chinese { font-size: clamp(.9rem, 2.8vh, 1.8rem); }
+      .card-pinyin { font-size: clamp(.6rem, 1.6vh, .95rem); }
+      .card-chinese { font-size: clamp(.88rem, 2.7vh, 1.7rem); }
       .card-img    { height: min(5.5vh, 44px); }
-      .btn         { padding: 7px 12px; font-size: .82rem; }
-      .level-badge { font-size: .72rem; padding: 4px 10px; }
-      .scoreboard  { font-size: .78rem; padding: 4px 10px; gap: 6px; }
-      .round-info  { font-size: .78rem; }
-      header h1    { font-size: clamp(.85rem, 3.5vw, 1.1rem); white-space: normal; }
-      .complete-box { padding: 26px 22px; }
-      .selector-box { padding: 22px 16px; }
+      /* controls: no wrap, emoji-only buttons */
+      .controls    { flex-wrap: nowrap; gap: 4px; }
+      .btn         { padding: 5px 10px; font-size: .78rem; }
+      .btn-label   { font-size: 0; }
+      .btn-label::before { content: attr(data-short); font-size: 1.1rem; line-height: 1; }
+      .level-badge { font-size: .68rem; padding: 3px 8px; }
+      .scoreboard  { font-size: .75rem; padding: 3px 8px; gap: 5px; }
+      /* hide long round-info text on phone */
+      .round-info  { display: none; }
+      /* thinner progress bar */
+      .progress-wrap { height: 6px; }
+      header h1    { font-size: clamp(.78rem, 3vw, 1rem); white-space: normal; }
+      .complete-box { padding: 22px 18px; }
+      .selector-box { padding: 18px 14px; }
     }
   </style>
 </head>
@@ -417,10 +428,10 @@
   </div>
   <div class="top-row2">
     <div class="controls">
-      <button class="btn btn-switch"   onclick="openSelector()">🎮 Switch Game</button>
-      <button class="btn btn-primary"  onclick="retryLevel()">🔁 Retry</button>
-      <button class="btn btn-accent"   onclick="resetAll()">🔄 Restart</button>
-      <button class="btn btn-neutral"  onclick="toggleHelp()">💡 Help</button>
+      <button class="btn btn-switch"   onclick="openSelector()"><span class="btn-label" data-full="🎮 Switch Game" data-short="🎮 Game">🎮 Switch Game</span></button>
+      <button class="btn btn-primary"  onclick="retryLevel()"><span class="btn-label" data-full="🔁 Retry" data-short="🔁 Retry">🔁 Retry</span></button>
+      <button class="btn btn-accent"   onclick="resetAll()"><span class="btn-label" data-full="🔄 Restart" data-short="🔄 Reset">🔄 Restart</span></button>
+      <button class="btn btn-neutral"  onclick="toggleHelp()"><span class="btn-label" data-full="💡 Help" data-short="💡 Help">💡 Help</span></button>
     </div>
     <div class="round-info" id="round-info">Loading…</div>
   </div>
