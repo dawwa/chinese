@@ -38,6 +38,7 @@
       font-family: var(--font-en);
       background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
       height: 100vh;
+      height: 100dvh; /* dynamic vh: avoids mobile browser-chrome overflow */
       overflow: hidden;
       display: flex;
       flex-direction: column;
@@ -135,6 +136,7 @@
       max-width: 900px;
       flex: 1;
       min-height: 0;
+      touch-action: none; /* prevent browser scroll hijacking during drag */
     }
 
     /* SVG overlay for lines */
@@ -161,7 +163,8 @@
       display: flex;
       flex-direction: column;
       gap: 5px;
-      width: 44%;
+      flex: 1;
+      min-width: 0;
       height: 100%;
     }
 
@@ -394,11 +397,20 @@
     .attr-img  { display: block; color: #8a5c2e; }
 
     /* ── Responsive ─────────────────────────────────────────────── */
-    @media (max-width: 500px) {
-      .col { width: 46%; }
-      .name-card { padding: 3px 6px; }
-      .img-card  { padding: 3px; }
-      .stroke-img { height: min(6.5vh, 52px); }
+    @media (max-width: 768px) {
+      body          { padding: 6px 8px; gap: 4px; }
+      .top-bar      { gap: 4px; }
+      .top-row1,
+      .top-row2     { gap: 6px; }
+      .columns      { gap: 16px; }
+      .name-card    { padding: 3px 6px; }
+      .img-card     { padding: 3px; }
+      .stroke-img   { height: min(6.5vh, 52px); }
+      .btn          { padding: 7px 14px; font-size: .9rem; }
+      .level-badge  { font-size: .78rem; padding: 4px 10px; }
+      .scoreboard   { font-size: .82rem; padding: 4px 12px; gap: 8px; }
+      .round-info   { font-size: .85rem; }
+      header h1     { font-size: clamp(.9rem, 3.5vw, 1.3rem); white-space: normal; }
     }
   </style>
 </head>
@@ -613,7 +625,7 @@ function renderColumns() {
              alt="${s.chinese}"
              onerror="this.outerHTML='<div class=\'img-error\'>图片加载失败</div>'" />
       </div>`;
-    card.addEventListener('pointerup', e => onImgUp(e, si));
+    card.addEventListener('pointerdown', e => onImgDown(e, si));
     colI.appendChild(card);
   });
 }
@@ -647,67 +659,92 @@ function removeDrawingLine() {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   INTERACTION — Name card (start drag)
+   INTERACTION — Name card (start drag or tap)
+   • Drag  : press name → drag finger → release over image → connects
+   • Tap-tap: tap name (highlights it) → tap image → connects
 ═══════════════════════════════════════════════════════════════ */
 function onNameDown(e, si) {
   e.preventDefault();
-  // already matched
   if (connections[si] !== undefined) return;
 
-  // deselect previous
+  // Tapping the already-selected card deselects it
+  if (selectedName === si) {
+    clearNameSelection();
+    removeDrawingLine();
+    return;
+  }
+
   clearNameSelection();
+  removeDrawingLine();
 
   selectedName = si;
-  const card = document.querySelector(`.name-card[data-si="${si}"]`);
-  card.classList.add('selected');
+  document.querySelector(`.name-card[data-si="${si}"]`).classList.add('selected');
 
-  // start drawing line
-  const dot = document.getElementById(`dot-name-${si}`);
+  const dot    = document.getElementById(`dot-name-${si}`);
   const origin = getDotCenter(dot);
 
-  removeDrawingLine();
   drawingLine = makeLine('line-pending');
   setLinePath(drawingLine, origin.x, origin.y, origin.x, origin.y);
 
-  // track pointer move for dragging line
-  const wrapper = document.getElementById('game-wrapper');
-  const wr = wrapper.getBoundingClientRect();
+  const startX = e.clientX;
+  const startY = e.clientY;
+  let   isDrag = false;
 
   function onMove(ev) {
-    const cx = (ev.clientX ?? ev.touches?.[0]?.clientX) - wr.left;
-    const cy = (ev.clientY ?? ev.touches?.[0]?.clientY) - wr.top;
+    if (!drawingLine) return;
+    const wr = document.getElementById('game-wrapper').getBoundingClientRect();
+    const cx = ev.clientX - wr.left;
+    const cy = ev.clientY - wr.top;
     setLinePath(drawingLine, origin.x, origin.y, cx, cy);
+    if (!isDrag && (Math.abs(ev.clientX - startX) > 8 || Math.abs(ev.clientY - startY) > 8)) {
+      isDrag = true;
+    }
   }
+
   function onUp(ev) {
     window.removeEventListener('pointermove', onMove);
-    window.removeEventListener('pointerup', onUp);
-    // if no img was hit, remove line and deselect
-    setTimeout(() => {
-      if (selectedName === si) {
-        removeDrawingLine();
+    window.removeEventListener('pointerup',   onUp);
+
+    // Hit-test: check what element is under the pointer at release
+    const el      = document.elementFromPoint(ev.clientX, ev.clientY);
+    const imgCard = el && el.closest('.img-card');
+
+    if (imgCard && selectedName !== null) {
+      const imgSi = parseInt(imgCard.dataset.si);
+      if (connections[imgSi] === undefined) {
+        const nameSi = selectedName;
         clearNameSelection();
+        removeDrawingLine();
+        attemptConnect(nameSi, imgSi, nameSi === imgSi);
+        return;
       }
-    }, 80);
+    }
+
+    // Drag that missed → deselect; simple tap → keep name highlighted for tap-tap
+    removeDrawingLine();
+    if (isDrag) clearNameSelection();
+    // else: selectedName stays set — user will tap an image card next
   }
 
   window.addEventListener('pointermove', onMove);
-  window.addEventListener('pointerup', onUp);
+  window.addEventListener('pointerup',   onUp);
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   INTERACTION — Image card (end drag / tap)
+   INTERACTION — Image card (tap-tap mode)
+   Fires on pointerdown when the user taps an image card after
+   already having tapped a name card (tap-tap flow).
+   Drag-release is handled in onNameDown via elementFromPoint.
 ═══════════════════════════════════════════════════════════════ */
-function onImgUp(e, imgSi) {
+function onImgDown(e, imgSi) {
+  if (selectedName === null) return;          // no name selected yet
+  if (connections[imgSi] !== undefined) return; // already matched
   e.preventDefault();
-  if (selectedName === null) return;
-  if (connections[imgSi] !== undefined) return; // img already matched
-
+  e.stopPropagation();
   const nameSi = selectedName;
   clearNameSelection();
   removeDrawingLine();
-
-  const correct = (nameSi === imgSi); // same index => same stroke
-  attemptConnect(nameSi, imgSi, correct);
+  attemptConnect(nameSi, imgSi, nameSi === imgSi);
 }
 
 function clearNameSelection() {
