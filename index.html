@@ -143,17 +143,18 @@
     /* ── Cards — thick border "game cartridge" feel ── */
     .match-card {
       background: var(--card-bg);
-      border-radius: 18px;
+      border-radius: 16px;
       box-shadow: 0 4px 16px rgba(0,0,0,.12);
-      padding: 4px 10px;
+      padding: 3px 10px;
       cursor: pointer;
-      border: 3px solid #D0D0E0;
+      border: 3px solid transparent;
       transition: border-color .13s, transform .12s, box-shadow .12s;
       display: flex;
       align-items: center;
       justify-content: center;
       flex: 1;
       min-height: 0;
+      overflow: hidden;
     }
     .match-card.left-card:hover  {
       transform: translateX(5px) scale(1.02);
@@ -181,8 +182,8 @@
 
     /* ── Card inner layout ── */
     .card-row { display: flex; align-items: center; gap: 8px; width: 100%; }
-    .card-content { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
-    .card-pinyin  { font-size: clamp(.85rem, 2vh, 1.3rem); color: #888; letter-spacing: .04em; text-align: center; line-height: 1.1; }
+    .card-content { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; overflow: hidden; }
+    .card-pinyin  { font-family: var(--font-en); font-weight: 400; font-size: clamp(.75rem, 1.9vh, 1.2rem); color: #888; letter-spacing: .04em; text-align: center; line-height: 1.1; }
     .card-chinese {
       font-family: var(--font-zh);
       font-size: clamp(1.1rem, 3.2vh, 2.2rem);
@@ -385,14 +386,16 @@
       body         { padding: 6px 8px 4px; gap: 4px; }
       .top-bar     { gap: 4px; padding: 6px 10px; }
       .top-row1, .top-row2 { gap: 6px; }
-      .columns     { gap: 14px; padding: 6px; }
-      .match-card  { padding: 3px 6px; border-radius: 14px; }
-      .card-img    { height: min(6.5vh, 52px); }
-      .btn         { padding: 7px 14px; font-size: .88rem; }
-      .level-badge { font-size: .76rem; padding: 4px 10px; }
-      .scoreboard  { font-size: .8rem; padding: 4px 12px; gap: 8px; }
-      .round-info  { font-size: .8rem; }
-      header h1    { font-size: clamp(.88rem, 3.5vw, 1.2rem); white-space: normal; }
+      .columns     { gap: 10px; padding: 4px; }
+      .match-card  { padding: 2px 5px; border-radius: 12px; }
+      .card-pinyin { font-size: clamp(.65rem, 1.7vh, 1rem); }
+      .card-chinese { font-size: clamp(.9rem, 2.8vh, 1.8rem); }
+      .card-img    { height: min(5.5vh, 44px); }
+      .btn         { padding: 7px 12px; font-size: .82rem; }
+      .level-badge { font-size: .72rem; padding: 4px 10px; }
+      .scoreboard  { font-size: .78rem; padding: 4px 10px; gap: 6px; }
+      .round-info  { font-size: .78rem; }
+      header h1    { font-size: clamp(.85rem, 3.5vw, 1.1rem); white-space: normal; }
       .complete-box { padding: 26px 22px; }
       .selector-box { padding: 22px 16px; }
     }
