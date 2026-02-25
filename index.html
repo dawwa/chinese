@@ -1,44 +1,34 @@
 <!DOCTYPE html>
 <!--
-  汉字笔画连线练习 — Chinese Stroke Matching Game
+  汉字练习连线游戏 — Chinese Matching Game
   Copyright © 2026 iwemeada LLC. All Rights Reserved.
-
-  This game (including its design, layout, interaction logic, level structure,
-  and source code) is the original creative work of the author.
-  Unauthorised reproduction, redistribution, or commercial use of this work
-  in whole or in part is prohibited without express written permission.
-
-  Stroke SVG images are sourced from Wikimedia Commons, created by Cangjie6,
-  and are licensed separately under CC BY-SA 4.0.
-  See footer for full image attribution.
 -->
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>汉字笔画连线练习 Chinese Stroke Matching</title>
+  <title>汉字连线练习 Chinese Matching Game</title>
   <style>
-    /* ── Global ────────────────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:        #fff8f0;
-      --primary:   #f4845f;
-      --accent:    #5bc0eb;
-      --correct:   #4caf50;
-      --wrong:     #e53935;
-      --card-bg:   #ffffff;
-      --shadow:    0 4px 16px rgba(0,0,0,.12);
-      --radius:    16px;
-      --font-zh:   'Noto Serif SC', 'KaiTi', 'STKaiti', serif;
-      --font-en:   'Segoe UI', Tahoma, sans-serif;
+      --bg:      #fff8f0;
+      --primary: #f4845f;
+      --accent:  #5bc0eb;
+      --correct: #4caf50;
+      --wrong:   #e53935;
+      --card-bg: #ffffff;
+      --shadow:  0 4px 16px rgba(0,0,0,.12);
+      --radius:  16px;
+      --font-zh: 'Noto Serif SC', 'KaiTi', 'STKaiti', serif;
+      --font-en: 'Segoe UI', Tahoma, sans-serif;
     }
 
     body {
       font-family: var(--font-en);
       background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
       height: 100vh;
-      height: 100dvh; /* dynamic vh: avoids mobile browser-chrome overflow */
+      height: 100dvh;
       overflow: hidden;
       display: flex;
       flex-direction: column;
@@ -48,58 +38,25 @@
       user-select: none;
     }
 
-    /* ── Top bar ─────────────────────────────────────────────────── */
-    .top-bar {
-      width: 100%;
-      max-width: 900px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      flex-shrink: 0;
-    }
-    .top-row1 {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-    .top-row2 {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
+    /* ── Top bar ── */
+    .top-bar { width: 100%; max-width: 900px; display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
+    .top-row1 { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
+    .top-row2 { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
 
-    /* ── Header ─────────────────────────────────────────────────── */
-    header {
-      text-align: center;
-    }
+    header { text-align: center; }
     header h1 {
-      font-size: clamp(1.2rem, 3vw, 1.75rem);
+      font-size: clamp(1.1rem, 3vw, 1.6rem);
       color: #4a2c00;
       font-family: var(--font-zh);
       letter-spacing: .06em;
       text-shadow: 1px 2px 3px rgba(0,0,0,.12);
       white-space: nowrap;
     }
-    header p { display: none; }
 
-    /* ── Controls ───────────────────────────────────────────────── */
-    .controls {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      justify-content: center;
-    }
+    .controls { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
     .btn {
-      padding: 11px 26px;
-      border: none;
-      border-radius: 30px;
-      font-size: 1.1rem;
-      font-weight: 600;
-      cursor: pointer;
+      padding: 11px 26px; border: none; border-radius: 30px;
+      font-size: 1.1rem; font-weight: 600; cursor: pointer;
       transition: transform .12s, box-shadow .12s;
       box-shadow: 0 2px 6px rgba(0,0,0,.18);
     }
@@ -107,69 +64,36 @@
     .btn-primary { background: var(--primary); color: #fff; }
     .btn-accent  { background: var(--accent);  color: #fff; }
     .btn-neutral { background: #e0e0e0;         color: #333; }
+    .btn-switch  { background: #9c27b0;         color: #fff; }
 
-    /* ── Scoreboard ─────────────────────────────────────────────── */
     .scoreboard {
-      display: flex;
-      gap: 16px;
-      font-size: 1rem;
-      font-weight: 700;
-      color: #4a2c00;
-      background: rgba(255,255,255,.55);
-      padding: 6px 18px;
-      border-radius: 30px;
+      display: flex; gap: 16px; font-size: 1rem; font-weight: 700; color: #4a2c00;
+      background: rgba(255,255,255,.55); padding: 6px 18px; border-radius: 30px;
       backdrop-filter: blur(4px);
     }
     .scoreboard span { display: flex; align-items: center; gap: 4px; }
 
-    /* ── Round info ─────────────────────────────────────────────── */
-    .round-info {
-      font-size: 1.05rem;
-      font-weight: 600;
-      color: #7a4500;
-    }
+    .round-info { font-size: 1.05rem; font-weight: 600; color: #7a4500; }
 
-    /* ── Game wrapper ───────────────────────────────────────────── */
+    /* ── Game wrapper ── */
     .game-wrapper {
-      position: relative;
-      width: 100%;
-      max-width: 900px;
-      flex: 1;
-      min-height: 0;
-      touch-action: none; /* prevent browser scroll hijacking during drag */
+      position: relative; width: 100%; max-width: 900px;
+      flex: 1; min-height: 0; touch-action: none;
     }
-
-    /* SVG overlay for lines */
     #line-canvas {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      pointer-events: none;
-      overflow: visible;
-      z-index: 10;
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none; overflow: visible; z-index: 10;
     }
 
-    /* ── Columns ────────────────────────────────────────────────── */
+    /* ── Columns ── */
     .columns {
-      display: flex;
-      justify-content: space-between;
-      align-items: stretch;
-      gap: 60px;
-      width: 100%;
-      height: 100%;
+      display: flex; justify-content: space-between; align-items: stretch;
+      gap: 60px; width: 100%; height: 100%;
     }
+    .col { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 0; height: 100%; }
 
-    .col {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-      flex: 1;
-      min-width: 0;
-      height: 100%;
-    }
-
-    /* ── Name card (left) ───────────────────────────────────────── */
-    .name-card {
+    /* ── Generic card (shared base) ── */
+    .match-card {
       background: var(--card-bg);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
@@ -178,146 +102,139 @@
       border: 3px solid transparent;
       transition: border-color .15s, transform .12s, box-shadow .12s;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
       flex: 1;
       min-height: 0;
     }
-    .name-card:hover  { transform: translateX(4px); box-shadow: 0 6px 20px rgba(0,0,0,.18); }
-    .name-card.selected { border-color: var(--accent); transform: translateX(4px); }
-    .name-card.matched  { border-color: var(--correct); background: #e8f5e9; pointer-events: none; }
-    .name-card.wrong    { border-color: var(--wrong);   animation: shake .35s; }
+    .match-card.left-card:hover  { transform: translateX(4px);  box-shadow: 0 6px 20px rgba(0,0,0,.18); }
+    .match-card.right-card:hover { transform: translateX(-4px); box-shadow: 0 6px 20px rgba(0,0,0,.18); }
+    .match-card.selected { border-color: var(--accent); }
+    .match-card.left-card.selected  { transform: translateX(4px); }
+    .match-card.right-card.selected { transform: translateX(-4px); }
+    .match-card.matched  { border-color: var(--correct); background: #e8f5e9; pointer-events: none; }
+    .match-card.wrong    { border-color: var(--wrong);   animation: shake .35s; }
 
-    .pinyin {
-      font-size: clamp(.95rem, 2.2vh, 1.5rem);
-      color: #888;
-      letter-spacing: .04em;
-      text-align: center;
-      line-height: 1.1;
-    }
-    .chinese {
-      font-family: var(--font-zh);
-      font-size: clamp(1.2rem, 3.5vh, 2.4rem);
-      color: #2c1000;
-      font-weight: 700;
-      text-align: center;
-      line-height: 1.15;
-    }
-
-    /* ── Image card (right) ─────────────────────────────────────── */
-    .img-card {
-      background: var(--card-bg);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 4px;
-      cursor: pointer;
-      border: 3px solid transparent;
-      transition: border-color .15s, transform .12s, box-shadow .12s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex: 1;
-      min-height: 0;
-    }
-    .img-card:hover   { transform: translateX(-4px); box-shadow: 0 6px 20px rgba(0,0,0,.18); }
-    .img-card.selected { border-color: var(--accent); transform: translateX(-4px); }
-    .img-card.matched  { border-color: var(--correct); background: #e8f5e9; pointer-events: none; }
-    .img-card.wrong    { border-color: var(--wrong);   animation: shake .35s; }
-
-    .stroke-img {
-      width: auto;
-      height: min(7vh, 62px);
-      max-width: 100%;
-      object-fit: contain;
-      display: block;
+    /* ── Card inner layout ── */
+    .card-row { display: flex; align-items: center; gap: 8px; width: 100%; }
+    .card-content { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; }
+    .card-pinyin  { font-size: clamp(.85rem, 2vh, 1.3rem); color: #888; letter-spacing: .04em; text-align: center; line-height: 1.1; }
+    .card-chinese { font-family: var(--font-zh); font-size: clamp(1.1rem, 3.2vh, 2.2rem); color: #2c1000; font-weight: 700; text-align: center; line-height: 1.15; }
+    .card-img {
+      width: auto; height: min(7vh, 62px); max-width: 100%;
+      object-fit: contain; display: block;
       filter: drop-shadow(1px 2px 3px rgba(0,0,0,.12));
     }
-    .img-error {
-      font-size: .7rem;
-      color: #bbb;
-      text-align: center;
-      padding: 6px;
-    }
+    .img-error { font-size: .7rem; color: #bbb; text-align: center; padding: 6px; }
 
-    /* ── Dot anchors ────────────────────────────────────────────── */
+    /* ── Dot anchors ── */
     .dot-right, .dot-left {
-      display: inline-block;
-      width: 12px; height: 12px;
-      border-radius: 50%;
-      background: #ccc;
-      border: 2px solid #aaa;
-      flex-shrink: 0;
-    }
-    .name-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      width: 100%;
-    }
-    .name-text { flex: 1; display: flex; flex-direction: column; align-items: center; }
-
-    .img-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      width: 100%;
+      display: inline-block; width: 12px; height: 12px;
+      border-radius: 50%; background: #ccc; border: 2px solid #aaa; flex-shrink: 0;
     }
 
-    /* ── Lines ──────────────────────────────────────────────────── */
-    .connector-line {
-      stroke-linecap: round;
-      fill: none;
-      stroke-width: 3;
-      filter: drop-shadow(1px 1px 2px rgba(0,0,0,.2));
-    }
-    .line-pending  { stroke: var(--accent);  stroke-dasharray: 6 4; stroke-width: 2.5; }
-    .line-correct  { stroke: var(--correct); stroke-width: 3.5; }
-    .line-wrong    { stroke: var(--wrong);   stroke-width: 3.5; }
+    /* ── Lines ── */
+    .connector-line { stroke-linecap: round; fill: none; stroke-width: 3; filter: drop-shadow(1px 1px 2px rgba(0,0,0,.2)); }
+    .line-pending { stroke: var(--accent);  stroke-dasharray: 6 4; stroke-width: 2.5; }
+    .line-correct { stroke: var(--correct); stroke-width: 3.5; }
+    .line-wrong   { stroke: var(--wrong);   stroke-width: 3.5; }
 
-    /* ── Feedback banner ────────────────────────────────────────── */
+    /* ── Progress ── */
+    .progress-wrap {
+      width: 100%; max-width: 900px; background: rgba(255,255,255,.4);
+      border-radius: 20px; height: 8px; flex-shrink: 0; overflow: hidden;
+    }
+    .progress-bar { height: 100%; background: linear-gradient(90deg, #f4845f, #fcb347); border-radius: 20px; transition: width .4s ease; }
+
+    /* ── Level badge ── */
+    .level-badge {
+      font-size: .95rem; font-weight: 800; padding: 6px 18px; border-radius: 30px;
+      letter-spacing: .04em; box-shadow: 0 2px 6px rgba(0,0,0,.15);
+      transition: background .4s, color .4s; white-space: nowrap;
+    }
+    .level-badge.lv1 { background: #d4edda; color: #155724; }
+    .level-badge.lv2 { background: #fff3cd; color: #856404; }
+    .level-badge.lv3 { background: #f8d7da; color: #721c24; }
+    .level-badge.lv4 { background: #e2d9f3; color: #4a235a; }
+    .level-badge.lv5 { background: #d1ecf1; color: #0c5460; }
+    .level-badge.lv6 { background: #fde9c9; color: #7a3e00; }
+
+    /* ── Feedback popup ── */
     .feedback {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(.7);
-      background: rgba(255,255,255,.97);
-      border-radius: 24px;
-      padding: 28px 44px;
-      text-align: center;
+      position: fixed; top: 50%; left: 50%;
+      transform: translate(-50%,-50%) scale(.7);
+      background: rgba(255,255,255,.97); border-radius: 24px;
+      padding: 28px 44px; text-align: center;
       box-shadow: 0 12px 40px rgba(0,0,0,.25);
-      z-index: 100;
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      gap: 14px;
+      z-index: 100; display: none; flex-direction: column; align-items: center; gap: 14px;
+      cursor: pointer;
     }
-    .feedback.show {
-      display: flex;
-      animation: popIn .28s cubic-bezier(.22,.68,0,1.36) forwards;
-    }
+    .feedback.show { display: flex; animation: popIn .28s cubic-bezier(.22,.68,0,1.36) forwards; }
     .feedback .emoji { font-size: 3rem; }
     .feedback .msg   { font-size: 1.4rem; font-weight: 700; color: #2c1000; }
     .feedback .sub   { font-size: 1rem; color: #666; }
 
-    /* ── Progress bar ───────────────────────────────────────────── */
-    .progress-wrap {
-      width: 100%;
-      max-width: 900px;
-      background: rgba(255,255,255,.4);
-      border-radius: 20px;
-      height: 8px;
-      flex-shrink: 0;
-      overflow: hidden;
+    /* ── Complete overlay ── */
+    .complete-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.55);
+      display: none; align-items: center; justify-content: center; z-index: 200;
     }
-    .progress-bar {
-      height: 100%;
-      background: linear-gradient(90deg, #f4845f, #fcb347);
-      border-radius: 20px;
-      transition: width .4s ease;
+    .complete-overlay.show { display: flex; }
+    .complete-box {
+      background: #fff; border-radius: 28px; padding: 40px 50px;
+      text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,.3);
+      max-width: 480px; width: 90%;
+    }
+    .complete-box .big-emoji { font-size: 4rem; margin-bottom: 10px; }
+    .complete-box h2 { font-size: 1.8rem; color: #2c1000; margin-bottom: 8px; font-family: var(--font-zh); }
+    .complete-box .stats { font-size: 1.1rem; color: #555; margin-bottom: 20px; }
+    .stars { font-size: 2rem; margin-bottom: 6px; letter-spacing: 4px; }
+
+    /* ── Game Selector overlay ── */
+    .selector-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.6);
+      display: none; align-items: center; justify-content: center; z-index: 300;
+    }
+    .selector-overlay.show { display: flex; }
+    .selector-box {
+      background: #fff; border-radius: 28px; padding: 32px 36px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.35); max-width: 540px; width: 92%;
+      max-height: 88vh; overflow-y: auto;
+    }
+    .selector-box h2 { font-size: 1.5rem; color: #2c1000; margin-bottom: 6px; font-family: var(--font-zh); text-align: center; }
+    .selector-box p.sub { font-size: .9rem; color: #888; text-align: center; margin-bottom: 18px; }
+    .pack-list { display: flex; flex-direction: column; gap: 10px; }
+    .pack-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 18px; border-radius: 16px; border: 2px solid #eee;
+      cursor: pointer; transition: border-color .15s, background .15s;
+      background: #fafafa;
+    }
+    .pack-item:hover { border-color: var(--accent); background: #f0faff; }
+    .pack-item.active-pack { border-color: var(--correct); background: #e8f5e9; }
+    .pack-icon { font-size: 2rem; flex-shrink: 0; }
+    .pack-info { flex: 1; }
+    .pack-name { font-size: 1.05rem; font-weight: 700; color: #2c1000; }
+    .pack-desc { font-size: .85rem; color: #777; margin-top: 2px; }
+    .pack-levels { font-size: .78rem; color: #aaa; margin-top: 2px; }
+    .selector-close {
+      margin-top: 20px; width: 100%; padding: 12px; border: none;
+      border-radius: 30px; background: var(--primary); color: #fff;
+      font-size: 1rem; font-weight: 700; cursor: pointer;
     }
 
-    /* ── Animations ─────────────────────────────────────────────── */
+    /* ── Attribution ── */
+    .attribution {
+      width: 100%; max-width: 900px; flex-shrink: 0;
+      text-align: center; font-size: .72rem; color: #8a5c2e;
+      background: rgba(255,255,255,.35); border-radius: 10px; padding: 4px 12px; line-height: 1.6;
+    }
+    .attribution a { color: #7a4500; text-decoration: underline; text-decoration-style: dotted; }
+    .attribution a:hover { color: #4a2c00; }
+    .attr-own  { display: block; font-weight: 700; color: #5a3800; }
+    .attr-img  { display: block; color: #8a5c2e; }
+
+    /* ── Animations ── */
     @keyframes shake {
       0%,100% { transform: translateX(0); }
       25%      { transform: translateX(-6px); }
@@ -334,83 +251,20 @@
     }
     .line-flash { animation: lineFlash .4s ease 2; }
 
-    /* ── Completion overlay ─────────────────────────────────────── */
-    .complete-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.55);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 200;
-    }
-    .complete-overlay.show { display: flex; }
-    .complete-box {
-      background: #fff;
-      border-radius: 28px;
-      padding: 40px 50px;
-      text-align: center;
-      box-shadow: 0 20px 60px rgba(0,0,0,.3);
-      max-width: 480px;
-      width: 90%;
-    }
-    .complete-box .big-emoji { font-size: 4rem; margin-bottom: 10px; }
-    .complete-box h2 { font-size: 1.8rem; color: #2c1000; margin-bottom: 8px; font-family: var(--font-zh); }
-    .complete-box .stats { font-size: 1.1rem; color: #555; margin-bottom: 20px; }
-    .stars { font-size: 2rem; margin-bottom: 6px; letter-spacing: 4px; }
-
-    /* ── Level badge ────────────────────────────────────────────── */
-    .level-badge {
-      font-size: .95rem;
-      font-weight: 800;
-      padding: 6px 18px;
-      border-radius: 30px;
-      letter-spacing: .04em;
-      box-shadow: 0 2px 6px rgba(0,0,0,.15);
-      transition: background .4s, color .4s;
-      white-space: nowrap;
-    }
-    .level-badge.lv1 { background: #d4edda; color: #155724; }
-    .level-badge.lv2 { background: #fff3cd; color: #856404; }
-    .level-badge.lv3 { background: #f8d7da; color: #721c24; }
-
-    /* ── Attribution footer ──────────────────────────────────────── */
-    .attribution {
-      width: 100%;
-      max-width: 900px;
-      flex-shrink: 0;
-      text-align: center;
-      font-size: .72rem;
-      color: #8a5c2e;
-      background: rgba(255,255,255,.35);
-      border-radius: 10px;
-      padding: 4px 12px;
-      line-height: 1.6;
-    }
-    .attribution a {
-      color: #7a4500;
-      text-decoration: underline;
-      text-decoration-style: dotted;
-    }
-    .attribution a:hover { color: #4a2c00; }
-    .attr-own  { display: block; font-weight: 700; color: #5a3800; }
-    .attr-img  { display: block; color: #8a5c2e; }
-
-    /* ── Responsive ─────────────────────────────────────────────── */
     @media (max-width: 768px) {
-      body          { padding: 6px 8px; gap: 4px; }
-      .top-bar      { gap: 4px; }
-      .top-row1,
-      .top-row2     { gap: 6px; }
-      .columns      { gap: 16px; }
-      .name-card    { padding: 3px 6px; }
-      .img-card     { padding: 3px; }
-      .stroke-img   { height: min(6.5vh, 52px); }
-      .btn          { padding: 7px 14px; font-size: .9rem; }
-      .level-badge  { font-size: .78rem; padding: 4px 10px; }
-      .scoreboard   { font-size: .82rem; padding: 4px 12px; gap: 8px; }
-      .round-info   { font-size: .85rem; }
-      header h1     { font-size: clamp(.9rem, 3.5vw, 1.3rem); white-space: normal; }
+      body         { padding: 6px 8px; gap: 4px; }
+      .top-bar     { gap: 4px; }
+      .top-row1, .top-row2 { gap: 6px; }
+      .columns     { gap: 16px; }
+      .match-card  { padding: 3px 6px; }
+      .card-img    { height: min(6.5vh, 52px); }
+      .btn         { padding: 7px 14px; font-size: .9rem; }
+      .level-badge { font-size: .78rem; padding: 4px 10px; }
+      .scoreboard  { font-size: .82rem; padding: 4px 12px; gap: 8px; }
+      .round-info  { font-size: .85rem; }
+      header h1    { font-size: clamp(.9rem, 3.5vw, 1.3rem); white-space: normal; }
+      .complete-box { padding: 28px 24px; }
+      .selector-box { padding: 24px 18px; }
     }
   </style>
 </head>
@@ -418,8 +272,8 @@
 
 <div class="top-bar">
   <div class="top-row1">
-    <header><h1>🖌️ 汉字笔画连线练习</h1></header>
-    <div class="level-badge lv1" id="level-badge">⭐ Level 1 — Basic</div>
+    <header><h1 id="app-title">🖌️ 汉字连线练习</h1></header>
+    <div class="level-badge lv1" id="level-badge">⭐ Level 1</div>
     <div class="scoreboard">
       <span>✅ <span id="score-correct">0</span> / <span id="score-total">8</span></span>
       <span>❌ <span id="score-wrong">0</span></span>
@@ -430,32 +284,31 @@
   </div>
   <div class="top-row2">
     <div class="controls">
-      <button class="btn btn-primary" onclick="retryLevel()">🔁 Retry</button>
-      <button class="btn btn-accent"  onclick="resetAll()">🔄 Restart</button>
-      <button class="btn btn-neutral" onclick="toggleHelp()">💡 Help</button>
+      <button class="btn btn-switch"   onclick="openSelector()">🎮 Switch Game</button>
+      <button class="btn btn-primary"  onclick="retryLevel()">🔁 Retry</button>
+      <button class="btn btn-accent"   onclick="resetAll()">🔄 Restart</button>
+      <button class="btn btn-neutral"  onclick="toggleHelp()">💡 Help</button>
     </div>
-    <div class="round-info" id="round-info">⭐ Level 1 — Basic Strokes 基础笔画</div>
+    <div class="round-info" id="round-info">Loading…</div>
   </div>
 </div>
 
 <div class="game-wrapper" id="game-wrapper">
   <svg id="line-canvas" xmlns="http://www.w3.org/2000/svg"></svg>
   <div class="columns" id="columns">
-    <div class="col" id="col-names"></div>
-    <div class="col" id="col-images"></div>
+    <div class="col" id="col-left"></div>
+    <div class="col" id="col-right"></div>
   </div>
 </div>
 
 <footer class="attribution">
   <div class="attr-own">
     🎮 Game design &amp; code &copy; 2026 IWEMEADA LLC &mdash; All Rights Reserved.
-    Unauthorised reproduction or redistribution is prohibited.
   </div>
-  <div class="attr-img">
+  <div class="attr-img" id="attr-img">
     Stroke images &copy; <a href="https://commons.wikimedia.org/wiki/User:Cangjie6" target="_blank" rel="noopener">Cangjie6</a>
     via <a href="https://commons.wikimedia.org/" target="_blank" rel="noopener">Wikimedia Commons</a>,
-    <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>,
-    used unmodified for educational purposes.
+    <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>.
   </div>
 </footer>
 
@@ -470,83 +323,261 @@
 <div class="complete-overlay" id="complete-overlay">
   <div class="complete-box">
     <div class="big-emoji" id="co-emoji">🎉</div>
-    <div class="stars" id="co-stars">⭐⭐⭐</div>
+    <div class="stars"     id="co-stars">⭐⭐⭐</div>
     <h2 id="co-title">太棒了！</h2>
     <div class="stats" id="co-stats"></div>
-    <button class="btn btn-primary" onclick="nextLevel()" id="co-btn">▶ Level 2</button>
+    <button class="btn btn-primary" id="co-btn" onclick="nextLevel()">▶ Next Level</button>
+  </div>
+</div>
+
+<!-- Game Selector overlay -->
+<div class="selector-overlay" id="selector-overlay">
+  <div class="selector-box">
+    <h2>🎮 选择游戏 Choose a Game</h2>
+    <p class="sub">Pick a matching category to practise</p>
+    <div class="pack-list" id="pack-list"></div>
+    <button class="selector-close" onclick="closeSelector()">✅ Start Playing</button>
   </div>
 </div>
 
 <script>
 /* ═══════════════════════════════════════════════════════════════
-   DATA  — 26 strokes in 3 levels ordered by complexity
+   GENERIC DATA SCHEMA
+   ─────────────────────────────────────────────────────────────
+   GAME_PACKS: Array of GamePack
+   ─────────────────────────────────────────────────────────────
+   GamePack {
+     id        : string          — unique key
+     icon      : string          — emoji
+     name      : string          — display name (EN)
+     nameCN    : string          — display name (ZH)
+     desc      : string          — short description
+     attribution: string|null    — HTML string shown in footer (null = hide)
+     levels: Array of Level {
+       id         : number
+       label      : string       — full label shown in round-info
+       shortLabel : string       — short label shown in badge
+       cls        : 'lv1'|'lv2'|'lv3'
+       pairs: Array of Pair {
+         left  : CardData
+         right : CardData
+       }
+     }
+   }
+
+   CardData {
+     pinyin  : string | null   — romanisation / pronunciation hint
+     chinese : string | null   — Chinese characters
+     img     : string | null   — image URL
+   }
+   At least one of (chinese, img) should be non-null.
 ═══════════════════════════════════════════════════════════════ */
-const LEVELS = [
-  {
-    id: 1,
-    label:      '⭐ Level 1 — Basic Strokes 基础笔画',
-    shortLabel: '⭐ Level 1 — Basic',
-    cls: 'lv1',
-    strokes: [
-      { pinyin: 'héng',    chinese: '横',  img: 'https://upload.wikimedia.org/wikipedia/commons/7/72/Cjk_k_str_h.svg'  },
-      { pinyin: 'shù',     chinese: '竖',  img: 'https://upload.wikimedia.org/wikipedia/commons/f/ff/Cjk_k_str_v.svg'  },
-      { pinyin: 'diǎn',    chinese: '点',  img: 'https://upload.wikimedia.org/wikipedia/commons/5/59/Cjk_k_str_d.svg'  },
-      { pinyin: 'piě',     chinese: '撇',  img: 'https://upload.wikimedia.org/wikipedia/commons/e/ed/Cjk_k_str_t.svg'  },
-      { pinyin: 'nà',      chinese: '捺',  img: 'https://upload.wikimedia.org/wikipedia/commons/3/39/Cjk_k_str_p.svg'  },
-      { pinyin: 'tí',      chinese: '提',  img: 'https://upload.wikimedia.org/wikipedia/commons/9/92/Cjk_k_str_u.svg'  },
-      { pinyin: 'shù gōu', chinese: '竖钩', img: 'https://upload.wikimedia.org/wikipedia/commons/7/79/Cjk_k_str_vj.svg' },
-      { pinyin: 'wān gōu', chinese: '弯钩', img: 'https://upload.wikimedia.org/wikipedia/commons/a/a2/Cjk_k_str_cj.svg' },
-    ]
-  },
-  {
-    id: 2,
-    label:      '⭐⭐ Level 2 — Compound Strokes 复合笔画',
-    shortLabel: '⭐⭐ Level 2 — Compound',
-    cls: 'lv2',
-    strokes: [
-      { pinyin: 'héng zhé', chinese: '横折', img: 'https://upload.wikimedia.org/wikipedia/commons/d/de/Cjk_k_str_hv.svg'  },
-      { pinyin: 'shù zhé',  chinese: '竖折', img: 'https://upload.wikimedia.org/wikipedia/commons/c/c4/Cjk_k_str_vh.svg'  },
-      { pinyin: 'héng gōu', chinese: '横钩', img: 'https://upload.wikimedia.org/wikipedia/commons/5/51/Cjk_k_str_hj.svg'  },
-      { pinyin: 'shù wān',  chinese: '竖弯', img: 'https://upload.wikimedia.org/wikipedia/commons/c/cc/Cjk_k_str_va.svg'  },
-      { pinyin: 'piě diǎn', chinese: '撇点', img: 'https://upload.wikimedia.org/wikipedia/commons/d/d7/Cjk_k_str_td.svg'  },
-      { pinyin: 'piě zhé',  chinese: '撇折', img: 'https://upload.wikimedia.org/wikipedia/commons/a/a4/Cjk_k_str_tu.svg'  },
-      { pinyin: 'xié gōu',  chinese: '斜钩', img: 'https://upload.wikimedia.org/wikipedia/commons/e/ec/Cjk_k_str_pj.svg'  },
-      { pinyin: 'wò gōu',   chinese: '卧钩', img: 'https://upload.wikimedia.org/wikipedia/commons/0/06/Cjk_k_str_fpj.svg' },
-      { pinyin: 'shù tí',   chinese: '竖提', img: 'https://upload.wikimedia.org/wikipedia/commons/7/75/Cjk_k_str_vu.svg'  },
-    ]
-  },
-  {
-    id: 3,
-    label:      '⭐⭐⭐ Level 3 — Complex Strokes 复杂笔画',
-    shortLabel: '⭐⭐⭐ Level 3 — Complex',
-    cls: 'lv3',
-    strokes: [
-      { pinyin: 'shù wān gōu',      chinese: '竖弯钩',  img: 'https://upload.wikimedia.org/wikipedia/commons/1/1a/Cjk_k_str_vaj.svg'  },
-      { pinyin: 'héng zhé gōu',     chinese: '横折钩',  img: 'https://upload.wikimedia.org/wikipedia/commons/a/ac/Cjk_k_str_hvj.svg'  },
-      { pinyin: 'héng zhé tí',      chinese: '横折提',  img: 'https://upload.wikimedia.org/wikipedia/commons/1/12/Cjk_k_str_hvu.svg'  },
-      { pinyin: 'héng piě',         chinese: '横撇',    img: 'https://upload.wikimedia.org/wikipedia/commons/9/9d/Cjk_k_str_ht.svg'   },
-      { pinyin: 'héng zhé wān gōu', chinese: '横折弯钩', img: 'https://upload.wikimedia.org/wikipedia/commons/8/8f/Cjk_k_str_haj.svg'  },
-      { pinyin: 'shù zhé zhé gōu',  chinese: '竖折折钩', img: 'https://upload.wikimedia.org/wikipedia/commons/9/9f/Cjk_k_str_vhtj.svg' },
-      { pinyin: 'héng piě wān gōu', chinese: '横撇弯钩', img: 'https://upload.wikimedia.org/wikipedia/commons/0/02/Cjk_k_str_htcj.svg' },
-      { pinyin: 'héng zhé zhé piě', chinese: '横折折撇', img: 'https://upload.wikimedia.org/wikipedia/commons/8/89/Cjk_k_str_htht.svg' },
-      { pinyin: 'héng zhé wān',     chinese: '横折弯',  img: 'https://upload.wikimedia.org/wikipedia/commons/4/45/Cjk_k_str_ha.svg'   },
-    ]
-  }
-];
+
+/* ── Helper: build a CardData quickly ── */
+const card = (pinyin, chinese, img = null) => ({ pinyin, chinese, img });
+const imgOnly = (img, alt = null) => ({ pinyin: null, chinese: alt, img });
+
+/* ═══════════════════════════════════════════════════════════════
+   PACK 1 — Stroke Matching (original game)
+═══════════════════════════════════════════════════════════════ */
+const PACK_STROKES = {
+  id: 'strokes',
+  icon: '🖌️',
+  name: 'Stroke Names',
+  nameCN: '汉字笔画',
+  desc: 'Match stroke names to their written form',
+  attribution: `Stroke images &copy; <a href="https://commons.wikimedia.org/wiki/User:Cangjie6" target="_blank" rel="noopener">Cangjie6</a>
+    via <a href="https://commons.wikimedia.org/" target="_blank" rel="noopener">Wikimedia Commons</a>,
+    <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>, used unmodified for educational purposes.`,
+  levels: [
+    {
+      id: 1, cls: 'lv1',
+      label:      '⭐ Level 1 — Basic Strokes 基础笔画',
+      shortLabel: '⭐ Level 1 — Basic',
+      pairs: [
+        { left: card('héng',    '横'),   right: imgOnly('https://upload.wikimedia.org/wikipedia/commons/7/72/Cjk_k_str_h.svg',  '横') },
+        { left: card('shù',     '竖'),   right: imgOnly('https://upload.wikimedia.org/wikipedia/commons/f/ff/Cjk_k_str_v.svg',  '竖') },
+        { left: card('diǎn',    '点'),   right: imgOnly('https://upload.wikimedia.org/wikipedia/commons/5/59/Cjk_k_str_d.svg',  '点') },
+        { left: card('piě',     '撇'),   right: imgOnly('https://upload.wikimedia.org/wikipedia/commons/e/ed/Cjk_k_str_t.svg',  '撇') },
+        { left: card('nà',      '捺'),   right: imgOnly('https://upload.wikimedia.org/wikipedia/commons/3/39/Cjk_k_str_p.svg',  '捺') },
+        { left: card('tí',      '提'),   right: imgOnly('https://upload.wikimedia.org/wikipedia/commons/9/92/Cjk_k_str_u.svg',  '提') },
+        { left: card('shù gōu','竖钩'), right: imgOnly('https://upload.wikimedia.org/wikipedia/commons/7/79/Cjk_k_str_vj.svg', '竖钩') },
+        { left: card('wān gōu','弯钩'), right: imgOnly('https://upload.wikimedia.org/wikipedia/commons/a/a2/Cjk_k_str_cj.svg', '弯钩') },
+      ]
+    },
+    {
+      id: 2, cls: 'lv2',
+      label:      '⭐⭐ Level 2 — Compound Strokes 复合笔画',
+      shortLabel: '⭐⭐ Level 2 — Compound',
+      pairs: [
+        { left: card('héng zhé','横折'), right: imgOnly('https://upload.wikimedia.org/wikipedia/commons/d/de/Cjk_k_str_hv.svg',  '横折') },
+        { left: card('shù zhé', '竖折'), right: imgOnly('https://upload.wikimedia.org/wikipedia/commons/c/c4/Cjk_k_str_vh.svg',  '竖折') },
+        { left: card('héng gōu','横钩'), right: imgOnly('https://upload.wikimedia.org/wikipedia/commons/5/51/Cjk_k_str_hj.svg',  '横钩') },
+        { left: card('shù wān', '竖弯'), right: imgOnly('https://upload.wikimedia.org/wikipedia/commons/c/cc/Cjk_k_str_va.svg',  '竖弯') },
+        { left: card('piě diǎn','撇点'), right: imgOnly('https://upload.wikimedia.org/wikipedia/commons/d/d7/Cjk_k_str_td.svg',  '撇点') },
+        { left: card('piě zhé', '撇折'), right: imgOnly('https://upload.wikimedia.org/wikipedia/commons/a/a4/Cjk_k_str_tu.svg',  '撇折') },
+        { left: card('xié gōu', '斜钩'), right: imgOnly('https://upload.wikimedia.org/wikipedia/commons/e/ec/Cjk_k_str_pj.svg',  '斜钩') },
+        { left: card('wò gōu',  '卧钩'), right: imgOnly('https://upload.wikimedia.org/wikipedia/commons/0/06/Cjk_k_str_fpj.svg', '卧钩') },
+        { left: card('shù tí',  '竖提'), right: imgOnly('https://upload.wikimedia.org/wikipedia/commons/7/75/Cjk_k_str_vu.svg',  '竖提') },
+      ]
+    },
+    {
+      id: 3, cls: 'lv3',
+      label:      '⭐⭐⭐ Level 3 — Complex Strokes 复杂笔画',
+      shortLabel: '⭐⭐⭐ Level 3 — Complex',
+      pairs: [
+        { left: card('shù wān gōu',      '竖弯钩'),  right: imgOnly('https://upload.wikimedia.org/wikipedia/commons/1/1a/Cjk_k_str_vaj.svg') },
+        { left: card('héng zhé gōu',     '横折钩'),  right: imgOnly('https://upload.wikimedia.org/wikipedia/commons/a/ac/Cjk_k_str_hvj.svg') },
+        { left: card('héng zhé tí',      '横折提'),  right: imgOnly('https://upload.wikimedia.org/wikipedia/commons/1/12/Cjk_k_str_hvu.svg') },
+        { left: card('héng piě',         '横撇'),    right: imgOnly('https://upload.wikimedia.org/wikipedia/commons/9/9d/Cjk_k_str_ht.svg') },
+        { left: card('héng zhé wān gōu', '横折弯钩'), right: imgOnly('https://upload.wikimedia.org/wikipedia/commons/8/8f/Cjk_k_str_haj.svg') },
+        { left: card('shù zhé zhé gōu',  '竖折折钩'), right: imgOnly('https://upload.wikimedia.org/wikipedia/commons/9/9f/Cjk_k_str_vhtj.svg') },
+        { left: card('héng piě wān gōu', '横撇弯钩'), right: imgOnly('https://upload.wikimedia.org/wikipedia/commons/0/02/Cjk_k_str_htcj.svg') },
+        { left: card('héng zhé zhé piě', '横折折撇'), right: imgOnly('https://upload.wikimedia.org/wikipedia/commons/8/89/Cjk_k_str_htht.svg') },
+        { left: card('héng zhé wān',     '横折弯'),  right: imgOnly('https://upload.wikimedia.org/wikipedia/commons/4/45/Cjk_k_str_ha.svg') },
+      ]
+    }
+  ]
+};
+
+/* ═══════════════════════════════════════════════════════════════
+   PACK 2 — Antonyms 反义词
+═══════════════════════════════════════════════════════════════ */
+const PACK_ANTONYMS = {
+  id: 'antonyms',
+  icon: '↔️',
+  name: 'Antonyms',
+  nameCN: '反义词',
+  desc: 'Match each word with its opposite',
+  attribution: null,
+  levels: [
+    {
+      id: 1, cls: 'lv1',
+      label:      '⭐ Level 1 — Basic Opposites 基础反义词',
+      shortLabel: '⭐ Level 1',
+      pairs: [
+        { left: card(null, '大'), right: card(null, '小') },
+        { left: card(null, '多'), right: card(null, '少') },
+        { left: card(null, '快'), right: card(null, '慢') },
+        { left: card(null, '来'), right: card(null, '去') },
+        { left: card(null, '上'), right: card(null, '下') },
+        { left: card(null, '左'), right: card(null, '右') },
+        { left: card(null, '黑'), right: card(null, '白') },
+        { left: card(null, '开'), right: card(null, '关') },
+      ]
+    },
+    {
+      id: 2, cls: 'lv2',
+      label:      '⭐⭐ Level 2 — Descriptive Opposites 描述反义词',
+      shortLabel: '⭐⭐ Level 2',
+      pairs: [
+        { left: card(null,  '新'), right: card(null,  '旧') },
+        { left: card(null,  '冷'), right: card(null,  '热') },
+        { left: card(null,  '高'), right: card(null,  '矮') },
+        { left: card(null,  '远'), right: card(null,  '近') },
+        { left: card(null,  '真'), right: card('jiǎ', '假') },
+        { left: card(null,  '对'), right: card('cuò', '错') },
+        { left: card(null,  '里'), right: card(null,  '外') },
+        { left: card(null,  '前'), right: card(null,  '后') },
+      ]
+    },
+    {
+      id: 3, cls: 'lv3',
+      label:      '⭐⭐⭐ Level 3 — Action & State Opposites 动作反义词',
+      shortLabel: '⭐⭐⭐ Level 3',
+      pairs: [
+        { left: card(null,     '有'),  right: card(null,       '无') },
+        { left: card(null,     '早'),  right: card(null,       '晚') },
+        { left: card(null,     '直'),  right: card(null,       '弯') },
+        { left: card(null,     '细'),  right: card('cū',       '粗') },
+        { left: card(null,     '凉'),  right: card(null,       '热') },
+        { left: card(null,     '加'),  right: card(null,       '减') },
+        { left: card(null,     '开心'), right: card('nán guò',  '难过') },
+      ]
+    },
+    {
+      id: 4, cls: 'lv4',
+      label:      '⭐⭐⭐⭐ Level 4 — Qualities & Emotions 性质情感',
+      shortLabel: '⭐⭐⭐⭐ Level 4',
+      pairs: [
+        { left: card(null, '聪明'), right: card(null, '笨')  },
+        { left: card(null, '干净'), right: card(null, '脏')  },
+        { left: card(null, '高兴'), right: card(null, '生气') },
+        { left: card(null, '脱'),   right: card(null, '穿')  },
+        { left: card(null, '轻'),   right: card(null, '响')  },
+        { left: card(null, '收'),   right: card(null, '放')  },
+        { left: card(null, '先'),   right: card(null, '后')  },
+      ]
+    },
+    {
+      id: 5, cls: 'lv5',
+      label:      '⭐⭐⭐⭐⭐ Level 5 — Simple Compounds 简单复合',
+      shortLabel: '⭐⭐⭐⭐⭐ Level 5',
+      pairs: [
+        { left: card(null,    '头'), right: card(null,    '尾') },
+        { left: card(null,    '出'), right: card(null,    '进') },
+        { left: card(null,    '升'), right: card('jiàng', '降') },
+        { left: card(null,    '正'), right: card('fǎn',   '反') },
+      ]
+    },
+    {
+      id: 6, cls: 'lv6',
+      label:      '⭐⭐⭐⭐⭐⭐ Level 6 — Compound Phrases 复合短语',
+      shortLabel: '⭐⭐⭐⭐⭐⭐ Level 6',
+      pairs: [
+        { left: card(null,        '出去'), right: card(null,        '进来') },
+        { left: card(null,        '升起'), right: card('jiàng luò', '降落') },
+        { left: card(null,        '正面'), right: card('fǎn miàn',  '反面') },
+        { left: card(null,        '睁开'), right: card(null,        '闭上') },
+      ]
+    },
+  ]
+};
+
+/* ═══════════════════════════════════════════════════════════════
+   PACK 3 — Measure Words (placeholder — replace with real data)
+═══════════════════════════════════════════════════════════════ */
+const PACK_MEASURE = {
+  id: 'measure',
+  icon: '📏',
+  name: 'Measure Words',
+  nameCN: '量词',
+  desc: 'Match the noun with the correct measure word',
+  attribution: null,
+  levels: [
+    {
+      id: 1, cls: 'lv1',
+      label:      '⭐ Level 1 — Common Measure Words 常用量词',
+      shortLabel: '⭐ Level 1',
+      pairs: [
+        { left: card('yī zhāng', '一张'), right: card('zhǐ',   '纸')   },
+        { left: card('yī běn',   '一本'), right: card('shū',   '书')   },
+        { left: card('yī tiáo', '一条'),  right: card('yú',    '鱼')   },
+        { left: card('yī zhī',   '一只'), right: card('māo',   '猫')   },
+        { left: card('yī bēi',   '一杯'), right: card('shuǐ',  '水')   },
+        { left: card('yī kuài',  '一块'), right: card('dàngāo','蛋糕') },
+      ]
+    }
+  ]
+};
+
+/* ── Master pack registry ── */
+const GAME_PACKS = [PACK_STROKES, PACK_ANTONYMS, PACK_MEASURE];
 
 /* ═══════════════════════════════════════════════════════════════
    STATE
 ═══════════════════════════════════════════════════════════════ */
-let currentLevel = 0;       // index into LEVELS (0, 1, 2)
-let roundStrokes = [];      // LEVELS[currentLevel].strokes
-let nameOrder    = [];      // display order for left column
-let imgOrder     = [];      // display order for right column
-let selectedName = null;
-let connections  = {};      // strokeIdx -> strokeIdx (correct matches)
-let wrongPairs   = new Set();
-let levelWrong   = 0;       // wrong attempts this level
-let feedbackTimer = null;
-let drawingLine   = null;
+let currentPackIdx  = 0;
+let currentLevel    = 0;
+let currentPairs    = [];   // pairs for this level (in original order)
+let leftOrder       = [];   // shuffled indices into currentPairs
+let rightOrder      = [];   // shuffled indices into currentPairs
+let selectedLeft    = null; // pair index selected on the left
+let connections     = {};   // leftIdx -> rightIdx (matched pairs)
+let wrongPairs      = new Set();
+let levelWrong      = 0;
+let feedbackTimer   = null;
+let drawingLine     = null;
 
 /* ═══════════════════════════════════════════════════════════════
    UTILITIES
@@ -564,82 +595,85 @@ function getDotCenter(el) {
   const wrapper = document.getElementById('game-wrapper');
   const wr = wrapper.getBoundingClientRect();
   const er = el.getBoundingClientRect();
-  return {
-    x: er.left + er.width / 2 - wr.left,
-    y: er.top  + er.height / 2 - wr.top
-  };
+  return { x: er.left + er.width / 2 - wr.left, y: er.top + er.height / 2 - wr.top };
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CARD RENDERER  — generic, handles pinyin + chinese + image
+═══════════════════════════════════════════════════════════════ */
+function buildCardInner(cardData) {
+  const parts = [];
+  if (cardData.pinyin)               parts.push(`<div class="card-pinyin">${cardData.pinyin}</div>`);
+  if (cardData.chinese && !cardData.img) parts.push(`<div class="card-chinese">${cardData.chinese}</div>`);
+  if (cardData.img)                  parts.push(`<img class="card-img" src="${cardData.img}" alt="${cardData.chinese || ''}"
+      onerror="this.outerHTML='<div class=\\'img-error\\'>图片加载失败</div>'" />`);
+  return parts.join('');
 }
 
 /* ═══════════════════════════════════════════════════════════════
    BUILD ROUND
 ═══════════════════════════════════════════════════════════════ */
 function buildRound() {
-  roundStrokes = LEVELS[currentLevel].strokes;
-  nameOrder = shuffle([...Array(roundStrokes.length).keys()]);
-  imgOrder  = shuffle([...Array(roundStrokes.length).keys()]);
+  const pack  = GAME_PACKS[currentPackIdx];
+  const level = pack.levels[currentLevel];
+  currentPairs = level.pairs;
+  leftOrder    = shuffle([...Array(currentPairs.length).keys()]);
+  rightOrder   = shuffle([...Array(currentPairs.length).keys()]);
   connections  = {};
   wrongPairs   = new Set();
   levelWrong   = 0;
-  selectedName = null;
+  selectedLeft = null;
   drawingLine  = null;
   renderColumns();
   clearSVG();
   updateLevelBadge();
   updateRoundInfo();
   updateScoreboard();
+  updateAttribution();
 }
 
 function renderColumns() {
-  const colN = document.getElementById('col-names');
-  const colI = document.getElementById('col-images');
-  colN.innerHTML = '';
-  colI.innerHTML = '';
+  const colL = document.getElementById('col-left');
+  const colR = document.getElementById('col-right');
+  colL.innerHTML = '';
+  colR.innerHTML = '';
 
-  nameOrder.forEach((si, pos) => {
-    const s = roundStrokes[si];
+  leftOrder.forEach(pairIdx => {
+    const pair = currentPairs[pairIdx];
     const card = document.createElement('div');
-    card.className = 'name-card';
-    card.dataset.si = si;
+    card.className = 'match-card left-card';
+    card.dataset.pairIdx = pairIdx;
     card.innerHTML = `
-      <div class="name-row">
-        <div class="name-text">
-          <div class="pinyin">${s.pinyin}</div>
-          <div class="chinese">${s.chinese}</div>
-        </div>
-        <div class="dot-right" id="dot-name-${si}"></div>
+      <div class="card-row">
+        <div class="card-content">${buildCardInner(pair.left)}</div>
+        <div class="dot-right" id="dot-left-${pairIdx}"></div>
       </div>`;
-    card.addEventListener('pointerdown', e => onNameDown(e, si));
-    colN.appendChild(card);
+    card.addEventListener('pointerdown', e => onLeftDown(e, pairIdx));
+    colL.appendChild(card);
   });
 
-  imgOrder.forEach((si, pos) => {
-    const s = roundStrokes[si];
+  rightOrder.forEach(pairIdx => {
+    const pair = currentPairs[pairIdx];
     const card = document.createElement('div');
-    card.className = 'img-card';
-    card.dataset.si = si;
+    card.className = 'match-card right-card';
+    card.dataset.pairIdx = pairIdx;
     card.innerHTML = `
-      <div class="img-row">
-        <div class="dot-left" id="dot-img-${si}"></div>
-        <img class="stroke-img"
-             src="${s.img}"
-             alt="${s.chinese}"
-             onerror="this.outerHTML='<div class=\'img-error\'>图片加载失败</div>'" />
+      <div class="card-row">
+        <div class="dot-left" id="dot-right-${pairIdx}"></div>
+        <div class="card-content">${buildCardInner(pair.right)}</div>
       </div>`;
-    card.addEventListener('pointerdown', e => onImgDown(e, si));
-    colI.appendChild(card);
+    card.addEventListener('pointerdown', e => onRightDown(e, pairIdx));
+    colR.appendChild(card);
   });
 }
 
 /* ═══════════════════════════════════════════════════════════════
    SVG LINE HELPERS
 ═══════════════════════════════════════════════════════════════ */
-function clearSVG() {
-  const svg = document.getElementById('line-canvas');
-  svg.innerHTML = '';
-}
+function clearSVG() { document.getElementById('line-canvas').innerHTML = ''; }
 
 function makeLine(cls) {
-  const svg = document.getElementById('line-canvas');
+  const svg  = document.getElementById('line-canvas');
   const line = document.createElementNS('http://www.w3.org/2000/svg', 'path');
   line.setAttribute('class', `connector-line ${cls}`);
   svg.appendChild(line);
@@ -652,78 +686,59 @@ function setLinePath(lineEl, x1, y1, x2, y2) {
 }
 
 function removeDrawingLine() {
-  if (drawingLine) {
-    drawingLine.remove();
-    drawingLine = null;
-  }
+  if (drawingLine) { drawingLine.remove(); drawingLine = null; }
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   INTERACTION — Name card (start drag or tap)
-   • Drag  : press name → drag finger → release over image → connects
-   • Tap-tap: tap name (highlights it) → tap image → connects
+   INTERACTION — Left card (drag or tap)
 ═══════════════════════════════════════════════════════════════ */
-function onNameDown(e, si) {
+function onLeftDown(e, pairIdx) {
   e.preventDefault();
-  if (connections[si] !== undefined) return;
+  if (connections[pairIdx] !== undefined) return;
 
-  // Tapping the already-selected card deselects it
-  if (selectedName === si) {
-    clearNameSelection();
-    removeDrawingLine();
-    return;
-  }
+  if (selectedLeft === pairIdx) { clearLeftSelection(); removeDrawingLine(); return; }
 
-  clearNameSelection();
+  clearLeftSelection();
   removeDrawingLine();
 
-  selectedName = si;
-  document.querySelector(`.name-card[data-si="${si}"]`).classList.add('selected');
+  selectedLeft = pairIdx;
+  document.querySelector(`.left-card[data-pair-idx="${pairIdx}"]`).classList.add('selected');
 
-  const dot    = document.getElementById(`dot-name-${si}`);
+  const dot    = document.getElementById(`dot-left-${pairIdx}`);
   const origin = getDotCenter(dot);
-
-  drawingLine = makeLine('line-pending');
+  drawingLine  = makeLine('line-pending');
   setLinePath(drawingLine, origin.x, origin.y, origin.x, origin.y);
 
-  const startX = e.clientX;
-  const startY = e.clientY;
-  let   isDrag = false;
+  const startX = e.clientX, startY = e.clientY;
+  let isDrag = false;
 
   function onMove(ev) {
     if (!drawingLine) return;
     const wr = document.getElementById('game-wrapper').getBoundingClientRect();
-    const cx = ev.clientX - wr.left;
-    const cy = ev.clientY - wr.top;
-    setLinePath(drawingLine, origin.x, origin.y, cx, cy);
-    if (!isDrag && (Math.abs(ev.clientX - startX) > 8 || Math.abs(ev.clientY - startY) > 8)) {
-      isDrag = true;
-    }
+    setLinePath(drawingLine, origin.x, origin.y, ev.clientX - wr.left, ev.clientY - wr.top);
+    if (!isDrag && (Math.abs(ev.clientX - startX) > 8 || Math.abs(ev.clientY - startY) > 8)) isDrag = true;
   }
 
   function onUp(ev) {
     window.removeEventListener('pointermove', onMove);
     window.removeEventListener('pointerup',   onUp);
 
-    // Hit-test: check what element is under the pointer at release
-    const el      = document.elementFromPoint(ev.clientX, ev.clientY);
-    const imgCard = el && el.closest('.img-card');
+    const el        = document.elementFromPoint(ev.clientX, ev.clientY);
+    const rightCard = el && el.closest('.right-card');
 
-    if (imgCard && selectedName !== null) {
-      const imgSi = parseInt(imgCard.dataset.si);
-      if (connections[imgSi] === undefined) {
-        const nameSi = selectedName;
-        clearNameSelection();
+    if (rightCard && selectedLeft !== null) {
+      const rightPairIdx = parseInt(rightCard.dataset.pairIdx);
+      if (connections[rightPairIdx] === undefined) {
+        const leftPairIdx = selectedLeft;
+        clearLeftSelection();
         removeDrawingLine();
-        attemptConnect(nameSi, imgSi, nameSi === imgSi);
+        attemptConnect(leftPairIdx, rightPairIdx, leftPairIdx === rightPairIdx);
         return;
       }
     }
 
-    // Drag that missed → deselect; simple tap → keep name highlighted for tap-tap
     removeDrawingLine();
-    if (isDrag) clearNameSelection();
-    // else: selectedName stays set — user will tap an image card next
+    if (isDrag) clearLeftSelection();
   }
 
   window.addEventListener('pointermove', onMove);
@@ -731,95 +746,91 @@ function onNameDown(e, si) {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   INTERACTION — Image card (tap-tap mode)
-   Fires on pointerdown when the user taps an image card after
-   already having tapped a name card (tap-tap flow).
-   Drag-release is handled in onNameDown via elementFromPoint.
+   INTERACTION — Right card (tap-tap mode)
 ═══════════════════════════════════════════════════════════════ */
-function onImgDown(e, imgSi) {
-  if (selectedName === null) return;          // no name selected yet
-  if (connections[imgSi] !== undefined) return; // already matched
+function onRightDown(e, rightPairIdx) {
+  if (selectedLeft === null) return;
+  if (connections[rightPairIdx] !== undefined) return;
   e.preventDefault();
   e.stopPropagation();
-  const nameSi = selectedName;
-  clearNameSelection();
+  const leftPairIdx = selectedLeft;
+  clearLeftSelection();
   removeDrawingLine();
-  attemptConnect(nameSi, imgSi, nameSi === imgSi);
+  attemptConnect(leftPairIdx, rightPairIdx, leftPairIdx === rightPairIdx);
 }
 
-function clearNameSelection() {
-  if (selectedName !== null) {
-    const card = document.querySelector(`.name-card[data-si="${selectedName}"]`);
+function clearLeftSelection() {
+  if (selectedLeft !== null) {
+    const card = document.querySelector(`.left-card[data-pair-idx="${selectedLeft}"]`);
     if (card) card.classList.remove('selected');
-    selectedName = null;
+    selectedLeft = null;
   }
 }
 
 /* ═══════════════════════════════════════════════════════════════
    CONNECTION LOGIC
 ═══════════════════════════════════════════════════════════════ */
-function attemptConnect(nameSi, imgSi, correct) {
-  const nameDot = document.getElementById(`dot-name-${nameSi}`);
-  const imgDot  = document.getElementById(`dot-img-${imgSi}`);
-  const p1 = getDotCenter(nameDot);
-  const p2 = getDotCenter(imgDot);
+function attemptConnect(leftPairIdx, rightPairIdx, correct) {
+  const leftDot  = document.getElementById(`dot-left-${leftPairIdx}`);
+  const rightDot = document.getElementById(`dot-right-${rightPairIdx}`);
+  const p1 = getDotCenter(leftDot);
+  const p2 = getDotCenter(rightDot);
 
   if (correct) {
-    connections[nameSi] = imgSi;
-
-    // draw permanent green line
+    connections[leftPairIdx] = rightPairIdx;
     const line = makeLine('line-correct');
     setLinePath(line, p1.x, p1.y, p2.x, p2.y);
-
-    // mark both cards
-    document.querySelector(`.name-card[data-si="${nameSi}"]`).classList.add('matched');
-    document.querySelector(`.img-card[data-si="${imgSi}"]`).classList.add('matched');
-
-    showFeedback(true, roundStrokes[nameSi]);
+    document.querySelector(`.left-card[data-pair-idx="${leftPairIdx}"]`).classList.add('matched');
+    document.querySelector(`.right-card[data-pair-idx="${rightPairIdx}"]`).classList.add('matched');
+    showFeedback(true, currentPairs[leftPairIdx]);
     updateScoreboard();
-
-    // check round complete
-    if (Object.keys(connections).length === roundStrokes.length) {
-      setTimeout(showRoundComplete, 800);
-    }
+    if (Object.keys(connections).length === currentPairs.length) setTimeout(showRoundComplete, 800);
   } else {
     levelWrong++;
-    const key = `${nameSi}-${imgSi}`;
+    const key = `${leftPairIdx}-${rightPairIdx}`;
     if (!wrongPairs.has(key)) {
       wrongPairs.add(key);
-      // flash red line then remove
       const line = makeLine('line-wrong');
       setLinePath(line, p1.x, p1.y, p2.x, p2.y);
       line.classList.add('line-flash');
       setTimeout(() => line.remove(), 900);
     }
-
-    // shake wrong cards
-    ['name-card','img-card'].forEach((cls, i) => {
-      const si = i === 0 ? nameSi : imgSi;
-      const card = document.querySelector(`.${cls}[data-si="${si}"]`);
-      card.classList.add('wrong');
-      setTimeout(() => card.classList.remove('wrong'), 400);
+    [['left-card', leftPairIdx], ['right-card', rightPairIdx]].forEach(([cls, idx]) => {
+      const c = document.querySelector(`.${cls}[data-pair-idx="${idx}"]`);
+      if (c) { c.classList.add('wrong'); setTimeout(() => c.classList.remove('wrong'), 400); }
     });
-
     showFeedback(false);
     updateScoreboard();
   }
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   FEEDBACK POPUP
+   FEEDBACK
 ═══════════════════════════════════════════════════════════════ */
-function showFeedback(correct, stroke) {
+function showFeedback(correct, pair) {
   clearTimeout(feedbackTimer);
   const fb = document.getElementById('feedback');
   document.getElementById('fb-emoji').textContent = correct ? '🎉' : '❌';
   document.getElementById('fb-msg').textContent   = correct ? 'Correct! 正确！' : 'Try again! 再试试！';
-  document.getElementById('fb-sub').textContent   = correct
-    ? `${stroke.pinyin}  ${stroke.chinese}`
-    : 'That doesn\'t match — try a different pair.';
+
+  if (correct && pair) {
+    const l = pair.left, r = pair.right;
+    const lStr = [l.pinyin, l.chinese].filter(Boolean).join(' ');
+    const rStr = [r.pinyin, r.chinese].filter(Boolean).join(' ');
+    document.getElementById('fb-sub').textContent = `${lStr}  ↔  ${rStr}`;
+  } else {
+    document.getElementById('fb-sub').textContent = "That doesn't match — try a different pair.";
+  }
+
   fb.classList.add('show');
-  feedbackTimer = setTimeout(() => fb.classList.remove('show'), correct ? 1400 : 1200);
+
+  // Dismiss on the very next pointer event anywhere on the page
+  const dismiss = () => {
+    clearTimeout(feedbackTimer);
+    fb.classList.remove('show');
+  };
+  feedbackTimer = setTimeout(dismiss, correct ? 1400 : 1200);
+  document.addEventListener('pointerdown', dismiss, { once: true, capture: true });
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -828,55 +839,70 @@ function showFeedback(correct, stroke) {
 function updateScoreboard() {
   const matched = Object.keys(connections).length;
   document.getElementById('score-correct').textContent = matched;
-  document.getElementById('score-total').textContent   = roundStrokes.length;
+  document.getElementById('score-total').textContent   = currentPairs.length;
   document.getElementById('score-wrong').textContent   = levelWrong;
-  // overall progress = completed levels + current level fraction
-  const totalStrokes = LEVELS.reduce((s, l) => s + l.strokes.length, 0);
-  const doneBefore   = LEVELS.slice(0, currentLevel).reduce((s, l) => s + l.strokes.length, 0);
-  const pct = Math.round((doneBefore + matched) / totalStrokes * 100);
+
+  const pack        = GAME_PACKS[currentPackIdx];
+  const totalPairs  = pack.levels.reduce((s, l) => s + l.pairs.length, 0);
+  const doneBefore  = pack.levels.slice(0, currentLevel).reduce((s, l) => s + l.pairs.length, 0);
+  const pct         = Math.round((doneBefore + matched) / totalPairs * 100);
   document.getElementById('progress-bar').style.width = pct + '%';
 }
 
 function updateLevelBadge() {
-  const lv = LEVELS[currentLevel];
+  const lv    = GAME_PACKS[currentPackIdx].levels[currentLevel];
   const badge = document.getElementById('level-badge');
   badge.textContent = lv.shortLabel;
   badge.className   = `level-badge ${lv.cls}`;
 }
 
 function updateRoundInfo() {
-  const lv = LEVELS[currentLevel];
+  const lv  = GAME_PACKS[currentPackIdx].levels[currentLevel];
   document.getElementById('round-info').textContent =
-    `${lv.label} — match all ${roundStrokes.length} strokes to advance`;
+    `${lv.label} — match all ${currentPairs.length} pairs to advance`;
+}
+
+function updateAttribution() {
+  const pack   = GAME_PACKS[currentPackIdx];
+  const footer = document.getElementById('attr-img');
+  footer.style.display = pack.attribution ? 'block' : 'none';
+  if (pack.attribution) footer.innerHTML = pack.attribution;
+
+  // Update page title
+  document.getElementById('app-title').textContent =
+    `${pack.icon} ${pack.nameCN} — ${pack.name}`;
 }
 
 /* ═══════════════════════════════════════════════════════════════
    LEVEL COMPLETE
 ═══════════════════════════════════════════════════════════════ */
 function showRoundComplete() {
-  const overlay = document.getElementById('complete-overlay');
-  const isLast  = currentLevel === LEVELS.length - 1;
+  const pack    = GAME_PACKS[currentPackIdx];
+  const isLast  = currentLevel === pack.levels.length - 1;
   const matched = Object.keys(connections).length;
   const attempts = matched + levelWrong;
   const accuracy = attempts === 0 ? 100 : Math.round(matched / attempts * 100);
-  const stars = levelWrong === 0 ? '⭐⭐⭐'
-              : levelWrong <= 2  ? '⭐⭐'
-              : '⭐';
+  const stars    = levelWrong === 0 ? '⭐⭐⭐' : levelWrong <= 2 ? '⭐⭐' : '⭐';
 
   document.getElementById('co-emoji').textContent = isLast ? '🏆' : '🎉';
   document.getElementById('co-stars').textContent = stars;
   document.getElementById('co-title').textContent = isLast ? '全部完成！All Done!' : '太棒了！Great job!';
 
-  const nextLv = !isLast ? LEVELS[currentLevel + 1] : null;
+  const nextLv = !isLast ? pack.levels[currentLevel + 1] : null;
   document.getElementById('co-stats').textContent = isLast
-    ? 'All 26 strokes mastered! You are a stroke champion! 🎊'
+    ? `All ${matched} pairs mastered! 🎊`
     : `Accuracy: ${accuracy}%  |  Mistakes: ${levelWrong}  |  Next: ${nextLv.shortLabel}`;
 
   const btn = document.getElementById('co-btn');
-  btn.textContent = isLast ? '🔄 Play Again' : `▶ Level ${currentLevel + 2}`;
-  btn.onclick     = isLast ? resetAll : nextLevel;
+  if (isLast) {
+    btn.textContent = '🔄 Play Again';
+    btn.onclick = resetAll;
+  } else {
+    btn.textContent = `▶ Level ${currentLevel + 2}`;
+    btn.onclick = nextLevel;
+  }
 
-  overlay.classList.add('show');
+  document.getElementById('complete-overlay').classList.add('show');
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -885,19 +911,19 @@ function showRoundComplete() {
 function nextLevel() {
   document.getElementById('complete-overlay').classList.remove('show');
   currentLevel++;
-  if (currentLevel >= LEVELS.length) { resetAll(); return; }
+  const pack = GAME_PACKS[currentPackIdx];
+  if (currentLevel >= pack.levels.length) { resetAll(); return; }
   buildRound();
 }
 
 function retryLevel() {
-  // reshuffle same level strokes with new layout
   clearSVG();
-  nameOrder = shuffle([...Array(roundStrokes.length).keys()]);
-  imgOrder  = shuffle([...Array(roundStrokes.length).keys()]);
+  leftOrder    = shuffle([...Array(currentPairs.length).keys()]);
+  rightOrder   = shuffle([...Array(currentPairs.length).keys()]);
   connections  = {};
   wrongPairs   = new Set();
   levelWrong   = 0;
-  selectedName = null;
+  selectedLeft = null;
   renderColumns();
   updateRoundInfo();
   updateScoreboard();
@@ -911,37 +937,70 @@ function resetAll() {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   HELP TOGGLE
+   GAME SELECTOR
+═══════════════════════════════════════════════════════════════ */
+function openSelector() {
+  const list = document.getElementById('pack-list');
+  list.innerHTML = '';
+  GAME_PACKS.forEach((pack, idx) => {
+    const item = document.createElement('div');
+    item.className = 'pack-item' + (idx === currentPackIdx ? ' active-pack' : '');
+    item.innerHTML = `
+      <div class="pack-icon">${pack.icon}</div>
+      <div class="pack-info">
+        <div class="pack-name">${pack.nameCN} &nbsp; ${pack.name}</div>
+        <div class="pack-desc">${pack.desc}</div>
+        <div class="pack-levels">${pack.levels.length} level${pack.levels.length > 1 ? 's' : ''} &nbsp;·&nbsp;
+          ${pack.levels.reduce((s, l) => s + l.pairs.length, 0)} pairs total</div>
+      </div>`;
+    item.addEventListener('click', () => loadPack(idx));
+    list.appendChild(item);
+  });
+  document.getElementById('selector-overlay').classList.add('show');
+}
+
+function closeSelector() {
+  document.getElementById('selector-overlay').classList.remove('show');
+}
+
+function loadPack(idx) {
+  currentPackIdx = idx;
+  currentLevel   = 0;
+  closeSelector();
+  buildRound();
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   HELP
 ═══════════════════════════════════════════════════════════════ */
 function toggleHelp() {
   alert(
     '📖 HOW TO PLAY\n\n' +
-    '1. Tap / click a stroke NAME on the left.\n' +
-    '2. Drag (or tap) to the matching IMAGE on the right.\n' +
+    '1. Tap / click an item on the LEFT side.\n' +
+    '2. Drag (or tap) to its matching item on the RIGHT.\n' +
     '3. A green line = correct match ✅\n' +
     '   A red flash  = wrong pair ❌\n' +
-    '4. Match all strokes to finish the round!\n\n' +
+    '4. Match all pairs to finish the round!\n' +
+    '5. Use "Switch Game" to choose a different category.\n\n' +
     '玩法说明：\n' +
-    '点击左侧笔画名称，拖线连到右侧对应图片。\n' +
+    '点击左侧选项，拖线连到右侧对应答案。\n' +
     '绿线表示正确，红色闪烁表示错误。\n' +
-    '全部连对即可过关！'
+    '全部连对即可过关！\n' +
+    '点击"Switch Game"切换不同练习主题。'
   );
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   RECALCULATE LINES ON RESIZE
+   RESIZE — redraw lines
 ═══════════════════════════════════════════════════════════════ */
 window.addEventListener('resize', () => {
-  // re-draw all correct lines after layout shift
   clearSVG();
-  Object.entries(connections).forEach(([nameSi, imgSi]) => {
-    const nd = document.getElementById(`dot-name-${nameSi}`);
-    const id = document.getElementById(`dot-img-${imgSi}`);
-    if (nd && id) {
-      const p1 = getDotCenter(nd);
-      const p2 = getDotCenter(id);
+  Object.entries(connections).forEach(([leftPairIdx, rightPairIdx]) => {
+    const ld = document.getElementById(`dot-left-${leftPairIdx}`);
+    const rd = document.getElementById(`dot-right-${rightPairIdx}`);
+    if (ld && rd) {
       const line = makeLine('line-correct');
-      setLinePath(line, p1.x, p1.y, p2.x, p2.y);
+      setLinePath(line, ...Object.values(getDotCenter(ld)), ...Object.values(getDotCenter(rd)));
     }
   });
 });
@@ -949,7 +1008,7 @@ window.addEventListener('resize', () => {
 /* ═══════════════════════════════════════════════════════════════
    INIT
 ═══════════════════════════════════════════════════════════════ */
-resetAll();
+buildRound();
 </script>
 </body>
 </html>
