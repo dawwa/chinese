@@ -255,7 +255,7 @@
       transform: translate(-50%,-50%) scale(.6);
       background: #fff;
       border-radius: 28px;
-      padding: 24px 40px; text-align: center;
+      padding: 20px 32px; text-align: center;
       box-shadow: 0 12px 40px rgba(0,0,0,.18);
       z-index: 100; display: none; flex-direction: column; align-items: center; gap: 12px;
       cursor: pointer;
@@ -263,8 +263,30 @@
     }
     .feedback.show { display: flex; animation: popIn .3s cubic-bezier(.22,.68,0,1.45) forwards; }
     .feedback .emoji { font-size: 3.5rem; animation: wobble .6s ease; }
-    .feedback .msg   { font-size: 1.5rem; font-weight: 900; color: #4a2c00; font-family: var(--font-en); }
-    .feedback .sub   { font-size: .95rem; color: #7a4500; font-weight: 700; }
+    .fb-stroke-img {
+      width: auto; height: clamp(48px, 10vh, 80px);
+      object-fit: contain;
+      filter: drop-shadow(1px 2px 4px rgba(0,0,0,.15));
+      animation: wobble .6s ease;
+    }
+    .fb-stroke-name {
+      font-family: var(--font-zh);
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #4a2c00;
+      letter-spacing: .04em;
+      text-align: center;
+      line-height: 1.3;
+    }
+    .fb-stroke-name .fb-pinyin {
+      font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+      font-weight: 400;
+      font-size: .95rem;
+      color: #888;
+    }
+    .feedback .msg   { font-size: 1.2rem; font-weight: 600; color: #4a2c00; font-family: 'Segoe UI', Tahoma, Arial, sans-serif; white-space: nowrap; }
+    .feedback .sub   { font-size: .95rem; color: #7a4500; font-weight: 400; font-family: 'Segoe UI', Tahoma, Arial, sans-serif; }
+    .feedback .sub.zh-phrase { font-family: var(--font-zh); font-size: 1.2rem; font-weight: 700; color: #4a2c00; letter-spacing: .06em; }
 
     /* ── Complete overlay ── */
     .complete-overlay {
@@ -464,6 +486,8 @@
 <!-- Feedback popup -->
 <div class="feedback" id="feedback">
   <div class="emoji" id="fb-emoji">✅</div>
+  <div class="fb-stroke-name" id="fb-name" style="display:none"></div>
+  <img id="fb-img" class="fb-stroke-img" src="" alt="" style="display:none" />
   <div class="msg"   id="fb-msg">Correct!</div>
   <div class="sub"   id="fb-sub"></div>
 </div>
@@ -1209,11 +1233,51 @@ function showFeedback(correct, pair) {
 
   if (correct && pair) {
     const l = pair.left, r = pair.right;
-    const lStr = [l.pinyin, l.chinese].filter(Boolean).join(' ');
-    const rStr = [r.pinyin, r.chinese].filter(Boolean).join(' ');
-    document.getElementById('fb-sub').textContent = `${lStr}  ↔  ${rStr}`;
+    const imgSrc = l.img || r.img || null;
+    const fbImg  = document.getElementById('fb-img');
+    const fbName = document.getElementById('fb-name');
+    const fbSubEl = document.getElementById('fb-sub');
+    const pack = GAME_PACKS[currentPackIdx];
+
+    if (imgSrc) {
+      fbImg.src = imgSrc;
+      fbImg.alt = l.chinese || r.chinese || '';
+      fbImg.style.display = 'block';
+      fbImg.style.animation = 'none';
+      fbImg.offsetWidth;
+      fbImg.style.animation = '';
+      document.getElementById('fb-emoji').style.display = 'none';
+    } else {
+      fbImg.style.display = 'none';
+      document.getElementById('fb-emoji').style.display = '';
+    }
+
+    if (pack.id === 'strokes') {
+      // Show "横 (héng)" above the image, hide sub
+      const chinese = l.chinese || '';
+      const pinyin  = l.pinyin  || '';
+      fbName.innerHTML = `<span class="fb-pinyin">(${pinyin})</span><br>${chinese}`;
+      fbName.style.display = 'block';
+      fbSubEl.textContent = '';
+      fbSubEl.classList.remove('zh-phrase');
+    } else if (pack.id === 'measure' && l.chinese && r.chinese) {
+      fbName.style.display = 'none';
+      fbSubEl.textContent = `一${l.chinese}${r.chinese}`;
+      fbSubEl.classList.add('zh-phrase');
+    } else {
+      fbName.style.display = 'none';
+      const lStr = [l.pinyin, l.chinese].filter(Boolean).join(' ');
+      const rStr = [r.pinyin, r.chinese].filter(Boolean).join(' ');
+      fbSubEl.textContent = `${lStr}  ↔  ${rStr}`;
+      fbSubEl.classList.remove('zh-phrase');
+    }
   } else {
-    document.getElementById('fb-sub').textContent = "That doesn't match — try a different pair.";
+    document.getElementById('fb-img').style.display = 'none';
+    document.getElementById('fb-emoji').style.display = '';
+    document.getElementById('fb-name').style.display = 'none';
+    const fbSubEl = document.getElementById('fb-sub');
+    fbSubEl.classList.remove('zh-phrase');
+    fbSubEl.textContent = "That doesn't match — try a different pair.";
   }
 
   fb.classList.add('show');
