@@ -158,6 +158,11 @@
     .level-badge.lv4 { background: #e2d9f3; color: #4a235a; }
     .level-badge.lv5 { background: #d1ecf1; color: #0c5460; }
     .level-badge.lv6 { background: #fde9c9; color: #7a3e00; }
+    .level-badge.lv7 { background: #d6eaff; color: #003366; }
+    .level-badge.lv8 { background: #ffe0f0; color: #6b0033; }
+    .level-badge.lv9 { background: #e8f5e9; color: #1b5e20; }
+    .level-badge.lv10 { background: #fff8e1; color: #4e3c00; }
+    .level-badge.lv11 { background: #f3e5f5; color: #4a148c; }
 
     /* ── Feedback popup ── */
     .feedback {
@@ -393,7 +398,7 @@ const PACK_STROKES = {
     {
       id: 1, cls: 'lv1',
       label:      '⭐ Level 1 — Basic Strokes 基础笔画',
-      shortLabel: '⭐ Level 1 — Basic',
+      shortLabel: '⭐ Level 1',
       pairs: [
         { left: card('héng',    '横'),   right: imgOnly('https://upload.wikimedia.org/wikipedia/commons/7/72/Cjk_k_str_h.svg',  '横') },
         { left: card('shù',     '竖'),   right: imgOnly('https://upload.wikimedia.org/wikipedia/commons/f/ff/Cjk_k_str_v.svg',  '竖') },
@@ -408,7 +413,7 @@ const PACK_STROKES = {
     {
       id: 2, cls: 'lv2',
       label:      '⭐⭐ Level 2 — Compound Strokes 复合笔画',
-      shortLabel: '⭐⭐ Level 2 — Compound',
+      shortLabel: '⭐⭐ Level 2',
       pairs: [
         { left: card('héng zhé','横折'), right: imgOnly('https://upload.wikimedia.org/wikipedia/commons/d/de/Cjk_k_str_hv.svg',  '横折') },
         { left: card('shù zhé', '竖折'), right: imgOnly('https://upload.wikimedia.org/wikipedia/commons/c/c4/Cjk_k_str_vh.svg',  '竖折') },
@@ -424,7 +429,7 @@ const PACK_STROKES = {
     {
       id: 3, cls: 'lv3',
       label:      '⭐⭐⭐ Level 3 — Complex Strokes 复杂笔画',
-      shortLabel: '⭐⭐⭐ Level 3 — Complex',
+      shortLabel: '⭐⭐⭐ Level 3',
       pairs: [
         { left: card('shù wān gōu',      '竖弯钩'),  right: imgOnly('https://upload.wikimedia.org/wikipedia/commons/1/1a/Cjk_k_str_vaj.svg') },
         { left: card('héng zhé gōu',     '横折钩'),  right: imgOnly('https://upload.wikimedia.org/wikipedia/commons/a/ac/Cjk_k_str_hvj.svg') },
@@ -542,22 +547,196 @@ const PACK_MEASURE = {
   icon: '📏',
   name: 'Measure Words',
   nameCN: '量词',
-  desc: 'Match the noun with the correct measure word',
+  desc: 'Match the measure word to what it counts',
   attribution: null,
   levels: [
     {
+      // Each measure word → one unambiguous noun from OCR data
+      // 对 好朋友 | 道 彩虹 | 棵 树 | 面 镜子 | 袋 苹果 | 朵 花 | 件 礼物 | 顶 帽子
       id: 1, cls: 'lv1',
-      label:      '⭐ Level 1 — Common Measure Words 常用量词',
+      label:      '⭐ Level 1 — Measure Words 量词（一）',
       shortLabel: '⭐ Level 1',
       pairs: [
-        { left: card('yī zhāng', '一张'), right: card('zhǐ',   '纸')   },
-        { left: card('yī běn',   '一本'), right: card('shū',   '书')   },
-        { left: card('yī tiáo', '一条'),  right: card('yú',    '鱼')   },
-        { left: card('yī zhī',   '一只'), right: card('māo',   '猫')   },
-        { left: card('yī bēi',   '一杯'), right: card('shuǐ',  '水')   },
-        { left: card('yī kuài',  '一块'), right: card('dàngāo','蛋糕') },
+        { left: card(null, '对'), right: card(null,           '好朋友') },
+        { left: card(null, '道'), right: card(null,           '彩虹')   },
+        { left: card(null, '棵'), right: card(null,           '树')     },
+        { left: card(null, '面'), right: card(null,           '镜子')   },
+        { left: card(null, '袋'), right: card(null,           '苹果')   },
+        { left: card(null, '朵'), right: card(null,           '花')     },
+        { left: card(null, '件'), right: card(null,           '礼物')   },
+        { left: card(null, '顶'), right: card(null,           '帽子')   },
       ]
-    }
+    },
+    {
+      // 对 花瓶 | 道 菜 | 棵 草 | 面 旗子 | 袋 面包 | 朵 云 | 件 事情 | 顶 伞
+      id: 2, cls: 'lv2',
+      label:      '⭐⭐ Level 2 — Measure Words 量词（二）',
+      shortLabel: '⭐⭐ Level 2',
+      pairs: [
+        { left: card(null, '对'), right: card(null,           '花瓶')   },
+        { left: card(null, '道'), right: card(null,           '菜')     },
+        { left: card(null, '棵'), right: card(null,           '草')     },
+        { left: card(null, '面'), right: card(null,           '旗子')   },
+        { left: card(null, '袋'), right: card(null,           '面包')   },
+        { left: card(null, '朵'), right: card(null,           '云')     },
+        { left: card(null, '件'), right: card(null,           '事情')   },
+        { left: card(null, '顶'), right: card('zhàng péng',   '帐篷')   },
+      ]
+    },
+    {
+      // 种 水果 | 匹 马 | 根 筷子 | 回 游戏 | 座 山 | 对 鸟 | 双 鞋 | 套 衣服
+      id: 3, cls: 'lv3',
+      label:      '⭐⭐⭐ Level 3 — Measure Words 量词（三）',
+      shortLabel: '⭐⭐⭐ Level 3',
+      pairs: [
+        { left: card(null, '种'), right: card(null, '水果') },
+        { left: card(null, '匹'), right: card(null, '马')   },
+        { left: card(null, '根'), right: card(null, '筷子') },
+        { left: card(null, '回'), right: card(null, '游戏') },
+        { left: card(null, '座'), right: card(null, '山')   },
+        { left: card(null, '对'), right: card(null, '鸟')   },
+        { left: card(null, '双'), right: card(null, '鞋')   },
+        { left: card(null, '套'), right: card(null, '衣服') },
+      ]
+    },
+    {
+      // 种 东西 | 匹 狼 | 根 绳子 | 回 老师 | 座 高楼 | 双 手 | 棵 菜 | 件 衣服
+      id: 4, cls: 'lv4',
+      label:      '⭐⭐⭐⭐ Level 4 — Measure Words 量词（四）',
+      shortLabel: '⭐⭐⭐⭐ Level 4',
+      pairs: [
+        { left: card(null, '种'), right: card(null, '东西') },
+        { left: card(null, '匹'), right: card(null, '狼')   },
+        { left: card(null, '根'), right: card(null, '绳子') },
+        { left: card(null, '回'), right: card(null, '老师') },
+        { left: card(null, '座'), right: card(null, '高楼') },
+        { left: card(null, '双'), right: card(null, '手')   },
+        { left: card(null, '棵'), right: card(null, '菜')   },
+        { left: card(null, '件'), right: card(null, '衣服') },
+      ]
+    },
+    {
+      // 块 石头 | 群 小孩 | 片 叶子 | 颗 星星 | 瓶 牛奶 | 头 大象 | 匹 马(confusable) already covered
+      // No 头↔马, 匹↔大象 confusion here — 头 and 匹 not in same level
+      id: 5, cls: 'lv5',
+      label:      '⭐⭐⭐⭐⭐ Level 5 — Measure Words 量词（五）',
+      shortLabel: '⭐⭐⭐⭐⭐ Level 5',
+      pairs: [
+        { left: card(null, '块'), right: card(null, '石头') },
+        { left: card(null, '群'), right: card(null, '小孩') },
+        { left: card(null, '片'), right: card(null, '叶子') },
+        { left: card(null, '颗'), right: card(null, '星星') },
+        { left: card(null, '瓶'), right: card(null, '牛奶') },
+        { left: card(null, '头'), right: card(null, '大象') },
+        { left: card(null, '对'), right: card('bāo tāi', '双胞胎') },
+        { left: card(null, '朵'), right: card(null, '浪花') },
+      ]
+    },
+    {
+      // 块 蛋糕 | 群 鸡 | 片 沙滩 | 颗 牙齿 | 瓶 药 | 头 老虎 | 颗 花生 | 根 玉米
+      id: 6, cls: 'lv6',
+      label:      '⭐⭐⭐⭐⭐⭐ Level 6 — Measure Words 量词（六）',
+      shortLabel: '⭐⭐⭐⭐⭐⭐ Level 6',
+      pairs: [
+        { left: card(null, '块'), right: card(null, '蛋糕') },
+        { left: card(null, '群'), right: card(null, '鸡')   },
+        { left: card(null, '片'), right: card(null, '沙滩') },
+        { left: card(null, '颗'), right: card(null, '牙齿') },
+        { left: card(null, '瓶'), right: card(null, '药')   },
+        { left: card(null, '头'), right: card(null, '老虎') },
+        { left: card(null, '根'), right: card(null, '玉米') },
+        { left: card(null, '种'), right: card(null, '动物') },
+      ]
+    },
+    {
+      // 块 木头 | 群 狐狸 | 片 天空 | 颗 葡萄 | 瓶 油 | 头 骆驼 | 双 筷子 | 座 房子
+      // (双筷子 not in same level as 根筷子 — ✓ L3 has 根筷子, here 双筷子)
+      id: 7, cls: 'lv7',
+      label:      '⭐⭐⭐⭐⭐⭐⭐ Level 7 — Measure Words 量词（七）',
+      shortLabel: '⭐⭐⭐⭐⭐⭐⭐ Level 7',
+      pairs: [
+        { left: card(null, '块'), right: card(null, '木头') },
+        { left: card(null, '群'), right: card(null, '狐狸') },
+        { left: card(null, '片'), right: card(null, '天空') },
+        { left: card(null, '颗'), right: card(null, '葡萄') },
+        { left: card(null, '瓶'), right: card(null, '油')   },
+        { left: card(null, '头'), right: card(null, '骆驼') },
+        { left: card(null, '双'), right: card(null, '筷子') },
+        { left: card(null, '座'), right: card(null, '房子') },
+      ]
+    },
+    {
+      // 套 书 | 面 墙 | 根 线 | 双 脚 | 顶 伞 | 种 笔 | 匹 布 | 座 桥
+      // 套↔书 (套↔衣服 was L3 — different level ✓)
+      // 根↔线 (根↔筷子 L3, 根↔绳子 L4, 根↔玉米 L6 — no 双↔筷子 in same level since 双↔脚 here ✓)
+      id: 8, cls: 'lv8',
+      label:      '⭐⭐⭐⭐⭐⭐⭐⭐ Level 8 — Measure Words 量词（八）',
+      shortLabel: '⭐⭐⭐⭐⭐⭐⭐⭐ Level 8',
+      pairs: [
+        { left: card(null, '套'), right: card(null, '书')   },
+        { left: card(null, '面'), right: card(null, '墙')   },
+        { left: card(null, '根'), right: card(null, '线')   },
+        { left: card(null, '双'), right: card(null, '脚')   },
+        { left: card(null, '顶'), right: card(null, '伞')   },
+        { left: card(null, '种'), right: card(null, '笔')   },
+        { left: card(null, '匹'), right: card(null, '布')   },
+        { left: card(null, '座'), right: card(null, '桥')   },
+      ]
+    },
+    {
+      // 头 牛 | 瓶 水 | 颗 花生 | 群 老人 | 片 海洋 | 块 肉 | 道 题目 | 根 木棒
+      // 块↔肉 and 片↔肉 never in same level (片↔海洋 here, not 片↔肉 ✓)
+      id: 9, cls: 'lv9',
+      label:      '⭐⭐⭐⭐⭐⭐⭐⭐⭐ Level 9 — Measure Words 量词（九）',
+      shortLabel: '⭐⭐⭐⭐⭐⭐⭐⭐⭐ Level 9',
+      pairs: [
+        { left: card(null, '头'), right: card(null, '牛')   },
+        { left: card(null, '瓶'), right: card(null, '水')   },
+        { left: card(null, '颗'), right: card(null, '花生') },
+        { left: card(null, '群'), right: card(null, '老人') },
+        { left: card(null, '片'), right: card(null, '海洋') },
+        { left: card(null, '块'), right: card(null, '肉')   },
+        { left: card(null, '道'), right: card(null, '题目') },
+        { left: card(null, '根'), right: card(null, '木棒') },
+      ]
+    },
+    {
+      // 头 猪 | 瓶 盐 | 颗 糖果 | 群 鸟 | 片 草地 | 块 水果 | 道 点心 | 根 头发
+      // 群↔鸟 (对↔鸟 was L3 — different level ✓)
+      // 片↔草地 (棵↔草 was L2; 根↔草 not used — ✓ no 棵 or 根 in same level)
+      // 块↔水果 (片↔切成片水果 different level ✓)
+      id: 10, cls: 'lv10',
+      label:      '⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐ Level 10 — Measure Words 量词（十）',
+      shortLabel: '⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐ Level 10',
+      pairs: [
+        { left: card(null, '头'), right: card(null, '猪')   },
+        { left: card(null, '瓶'), right: card(null, '盐')   },
+        { left: card(null, '颗'), right: card(null, '糖果') },
+        { left: card(null, '群'), right: card(null, '鸟')   },
+        { left: card(null, '片'), right: card(null, '草地') },
+        { left: card(null, '块'), right: card(null, '水果') },
+        { left: card(null, '道'), right: card(null, '点心') },
+        { left: card(null, '根'), right: card(null, '头发') },
+      ]
+    },
+    {
+      // 头 狮子 | 瓶 白糖 | 颗 小石子 | 群 羊 | 片 树林 | 片 肉 — conflict! use 片↔饼干
+      // 头 牛 L9, 头 猪 L10 → 头 狮子 L11 ✓
+      // 片↔饼干 (片↔叶子 L5, 片↔沙滩 L6, 片↔天空 L7, 片↔海洋 L9, 片↔草地 L10 — ✓)
+      id: 11, cls: 'lv11',
+      label:      '⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐ Level 11 — Measure Words 量词（十一）',
+      shortLabel: '⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐ Level 11',
+      pairs: [
+        { left: card(null, '头'), right: card(null, '狮子') },
+        { left: card(null, '瓶'), right: card(null, '白糖') },
+        { left: card(null, '颗'), right: card(null, '小石子') },
+        { left: card(null, '群'), right: card(null, '羊')   },
+        { left: card(null, '片'), right: card(null, '饼干') },
+        { left: card(null, '种'), right: card(null, '菜')   },
+        { left: card(null, '道'), right: card(null, '线条') },
+        { left: card(null, '根'), right: card(null, '草')   },
+      ]
+    },
   ]
 };
 
@@ -921,9 +1100,11 @@ function updateScoreboard() {
 }
 
 function updateLevelBadge() {
-  const lv    = GAME_PACKS[currentPackIdx].levels[currentLevel];
+  const pack  = GAME_PACKS[currentPackIdx];
+  const lv    = pack.levels[currentLevel];
+  const total = pack.levels.length;
   const badge = document.getElementById('level-badge');
-  badge.textContent = lv.shortLabel;
+  badge.textContent = `${lv.shortLabel} of ${total}`;
   badge.className   = `level-badge ${lv.cls}`;
 }
 
