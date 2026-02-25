@@ -573,6 +573,7 @@ let currentPairs    = [];   // pairs for this level (in original order)
 let leftOrder       = [];   // shuffled indices into currentPairs
 let rightOrder      = [];   // shuffled indices into currentPairs
 let selectedLeft    = null; // pair index selected on the left
+let selectedRight   = null; // pair index selected on the right
 let connections     = {};   // leftIdx -> rightIdx (matched pairs)
 let wrongPairs      = new Set();
 let levelWrong      = 0;
@@ -622,8 +623,9 @@ function buildRound() {
   connections  = {};
   wrongPairs   = new Set();
   levelWrong   = 0;
-  selectedLeft = null;
-  drawingLine  = null;
+  selectedLeft  = null;
+  selectedRight = null;
+  drawingLine   = null;
   renderColumns();
   clearSVG();
   updateLevelBadge();
@@ -696,6 +698,15 @@ function onLeftDown(e, pairIdx) {
   e.preventDefault();
   if (connections[pairIdx] !== undefined) return;
 
+  // Complete a right→left tap-tap connection
+  if (selectedRight !== null) {
+    const rightPairIdx = selectedRight;
+    clearRightSelection();
+    removeDrawingLine();
+    attemptConnect(pairIdx, rightPairIdx, pairIdx === rightPairIdx);
+    return;
+  }
+
   if (selectedLeft === pairIdx) { clearLeftSelection(); removeDrawingLine(); return; }
 
   clearLeftSelection();
@@ -749,14 +760,66 @@ function onLeftDown(e, pairIdx) {
    INTERACTION — Right card (tap-tap mode)
 ═══════════════════════════════════════════════════════════════ */
 function onRightDown(e, rightPairIdx) {
-  if (selectedLeft === null) return;
-  if (connections[rightPairIdx] !== undefined) return;
   e.preventDefault();
-  e.stopPropagation();
-  const leftPairIdx = selectedLeft;
-  clearLeftSelection();
+  if (connections[rightPairIdx] !== undefined) return;
+
+  // Complete a left→right tap-tap connection
+  if (selectedLeft !== null) {
+    const leftPairIdx = selectedLeft;
+    clearLeftSelection();
+    removeDrawingLine();
+    attemptConnect(leftPairIdx, rightPairIdx, leftPairIdx === rightPairIdx);
+    return;
+  }
+
+  // Toggle right selection off
+  if (selectedRight === rightPairIdx) { clearRightSelection(); removeDrawingLine(); return; }
+
+  clearRightSelection();
   removeDrawingLine();
-  attemptConnect(leftPairIdx, rightPairIdx, leftPairIdx === rightPairIdx);
+
+  selectedRight = rightPairIdx;
+  document.querySelector(`.right-card[data-pair-idx="${rightPairIdx}"]`).classList.add('selected');
+
+  const dot    = document.getElementById(`dot-right-${rightPairIdx}`);
+  const origin = getDotCenter(dot);
+  drawingLine  = makeLine('line-pending');
+  setLinePath(drawingLine, origin.x, origin.y, origin.x, origin.y);
+
+  const startX = e.clientX, startY = e.clientY;
+  let isDrag = false;
+
+  function onMove(ev) {
+    if (!drawingLine) return;
+    const wr = document.getElementById('game-wrapper').getBoundingClientRect();
+    setLinePath(drawingLine, ev.clientX - wr.left, ev.clientY - wr.top, origin.x, origin.y);
+    if (!isDrag && (Math.abs(ev.clientX - startX) > 8 || Math.abs(ev.clientY - startY) > 8)) isDrag = true;
+  }
+
+  function onUp(ev) {
+    window.removeEventListener('pointermove', onMove);
+    window.removeEventListener('pointerup',   onUp);
+
+    const el       = document.elementFromPoint(ev.clientX, ev.clientY);
+    const leftCard = el && el.closest('.left-card');
+
+    if (leftCard && selectedRight !== null) {
+      const leftPairIdx = parseInt(leftCard.dataset.pairIdx);
+      if (connections[leftPairIdx] === undefined) {
+        const rPairIdx = selectedRight;
+        clearRightSelection();
+        removeDrawingLine();
+        attemptConnect(leftPairIdx, rightPairIdx, leftPairIdx === rPairIdx);
+        return;
+      }
+    }
+
+    removeDrawingLine();
+    if (isDrag) clearRightSelection();
+  }
+
+  window.addEventListener('pointermove', onMove);
+  window.addEventListener('pointerup',   onUp);
 }
 
 function clearLeftSelection() {
@@ -764,6 +827,14 @@ function clearLeftSelection() {
     const card = document.querySelector(`.left-card[data-pair-idx="${selectedLeft}"]`);
     if (card) card.classList.remove('selected');
     selectedLeft = null;
+  }
+}
+
+function clearRightSelection() {
+  if (selectedRight !== null) {
+    const card = document.querySelector(`.right-card[data-pair-idx="${selectedRight}"]`);
+    if (card) card.classList.remove('selected');
+    selectedRight = null;
   }
 }
 
@@ -923,7 +994,8 @@ function retryLevel() {
   connections  = {};
   wrongPairs   = new Set();
   levelWrong   = 0;
-  selectedLeft = null;
+  selectedLeft  = null;
+  selectedRight = null;
   renderColumns();
   updateRoundInfo();
   updateScoreboard();
