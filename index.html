@@ -276,20 +276,20 @@
     .complete-overlay.show { display: flex; animation: fadeInOverlay .25s ease; }
     .complete-box {
       background: #fff;
-      border-radius: 32px; padding: 36px 48px;
+      border-radius: 28px; padding: 28px 36px;
       text-align: center;
       box-shadow: 0 20px 60px rgba(0,0,0,.20);
-      max-width: 480px; width: 92%;
+      max-width: 440px; width: 88%;
       border: 2px solid rgba(244,132,95,.25);
-      animation: popIn .35s cubic-bezier(.22,.68,0,1.36) forwards;
+      animation: boxPopIn .35s cubic-bezier(.22,.68,0,1.36) forwards;
     }
-    .complete-box .big-emoji { font-size: 4.5rem; margin-bottom: 10px; animation: bounce 0.6s ease; }
+    .complete-box .big-emoji { font-size: 3.8rem; margin-bottom: 8px; animation: bounce 0.6s ease; }
     .complete-box h2 {
-      font-size: 1.9rem; color: #4a2c00; margin-bottom: 8px;
+      font-size: 1.6rem; color: #4a2c00; margin-bottom: 6px;
       font-family: var(--font-zh); font-weight: 900;
     }
-    .complete-box .stats { font-size: 1rem; color: #7a4500; margin-bottom: 20px; font-weight: 700; }
-    .stars { font-size: 2.4rem; margin-bottom: 8px; letter-spacing: 6px; }
+    .complete-box .stats { font-size: .95rem; color: #7a4500; margin-bottom: 16px; font-weight: 700; }
+    .stars { font-size: 2rem; margin-bottom: 6px; letter-spacing: 4px; }
 
     /* ── Game Selector overlay ── */
     .selector-overlay {
@@ -299,11 +299,12 @@
     }
     .selector-overlay.show { display: flex; }
     .selector-box {
-      background: #fff; border-radius: 30px; padding: 28px 32px;
+      background: #fff; border-radius: 26px; padding: 24px 28px;
       box-shadow: 0 20px 60px rgba(0,0,0,.18);
-      max-width: 540px; width: 92%;
+      max-width: 520px; width: 90%;
       max-height: 88vh; overflow-y: auto;
       border: 2px solid rgba(10,185,230,.2);
+      animation: boxPopIn .3s cubic-bezier(.22,.68,0,1.36) forwards;
     }
     .selector-box h2 {
       font-size: 1.5rem; color: #4a2c00; margin-bottom: 6px;
@@ -357,6 +358,10 @@
       from { transform: translate(-50%,-50%) scale(.5) rotate(-4deg); opacity: 0; }
       to   { transform: translate(-50%,-50%) scale(1)  rotate(0deg);  opacity: 1; }
     }
+    @keyframes boxPopIn {
+      from { transform: scale(.6) rotate(-3deg); opacity: 0; }
+      to   { transform: scale(1)  rotate(0deg);  opacity: 1; }
+    }
     @keyframes wobble {
       0%   { transform: rotate(0deg) scale(1); }
       25%  { transform: rotate(-12deg) scale(1.15); }
@@ -407,8 +412,8 @@
       /* thinner progress bar */
       .progress-wrap { height: 6px; }
       header h1    { font-size: clamp(.78rem, 3vw, 1rem); white-space: normal; }
-      .complete-box { padding: 22px 18px; }
-      .selector-box { padding: 18px 14px; }
+      .complete-box { padding: 18px 16px; border-radius: 20px; }
+      .selector-box { padding: 16px 12px; }
     }
   </style>
 </head>
