@@ -70,7 +70,7 @@
       background: rgba(255,255,255,.55);
       border-radius: 16px; padding: 5px 12px;
       border: 2px solid rgba(255,255,255,.7);
-      backdrop-filter: blur(8px);
+      backdrop-filter: blur(2px);
       margin-top: 4px;
       box-shadow: 0 2px 12px rgba(0,0,0,.10);
     }
@@ -109,6 +109,30 @@
     .btn-accent  { background: var(--sw-blue);   color: #fff; }
     .btn-neutral { background: #4A4A6A;           color: #ddd; }
     .btn-switch  { background: var(--sw-orange);  color: #fff; }
+
+    /* ── Celebration toggle ── */
+    .celeb-toggle-wrap {
+      display: flex; align-items: center; gap: 6px;
+      font-size: .8rem; font-weight: 800; color: #4a2c00;
+      background: rgba(255,255,255,.65); padding: 4px 10px 4px 8px; border-radius: 50px;
+      border: 2px solid rgba(255,255,255,.8);
+      cursor: pointer; user-select: none;
+      white-space: nowrap;
+    }
+    .toggle-track {
+      width: 36px; height: 20px; border-radius: 10px;
+      background: #bbb; position: relative; transition: background .22s;
+      flex-shrink: 0;
+    }
+    .toggle-track.on { background: var(--correct); }
+    .toggle-thumb {
+      position: absolute; top: 2px; left: 2px;
+      width: 16px; height: 16px; border-radius: 50%;
+      background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.28);
+      transition: left .22s;
+      will-change: left;
+    }
+    .toggle-track.on .toggle-thumb { left: 18px; }
 
     /* ── Scoreboard ── */
     .scoreboard {
@@ -155,6 +179,7 @@
       flex: 1;
       min-height: 0;
       overflow: hidden;
+      will-change: transform;
     }
     .match-card.left-card:hover  {
       transform: translateX(5px) scale(1.02);
@@ -168,7 +193,10 @@
     }
     .match-card.selected {
       border-color: var(--sw-orange);
-      box-shadow: 0 4px 16px rgba(0,0,0,.12), 0 0 0 3px rgba(255,130,0,.35);
+      box-shadow: 0 4px 16px rgba(0,0,0,.12);
+      outline: 3px solid rgba(255,130,0,.65);
+      outline-offset: 1px;
+      animation: selectedPulse 1.1s ease-in-out infinite;
     }
     .match-card.left-card.selected  { transform: translateX(5px) scale(1.03); }
     .match-card.right-card.selected { transform: translateX(-5px) scale(1.03); }
@@ -178,7 +206,7 @@
       box-shadow: 0 4px 14px rgba(57,211,83,.2);
       pointer-events: none;
     }
-    .match-card.wrong { border-color: var(--wrong); animation: shake .35s; }
+    .match-card.wrong { border-color: #222; animation: shake .35s; }
 
     /* ── Card inner layout ── */
     .card-row { display: flex; align-items: center; gap: 8px; width: 100%; }
@@ -212,7 +240,7 @@
     .connector-line { stroke-linecap: round; fill: none; stroke-width: 4; filter: drop-shadow(1px 2px 3px rgba(0,0,0,.25)); }
     .line-pending { stroke: var(--sw-orange); stroke-dasharray: 8 5; stroke-width: 3; }
     .line-correct { stroke: var(--correct); stroke-width: 4.5; }
-    .line-wrong   { stroke: var(--wrong);   stroke-width: 4.5; }
+    .line-wrong   { stroke: #444; stroke-width: 4.5; stroke-dasharray: 7 4; }
 
     /* ── Progress bar ── */
     .progress-wrap {
@@ -261,13 +289,13 @@
       cursor: pointer;
       border: 2px solid rgba(244,132,95,.25);
     }
-    .feedback.show { display: flex; animation: popIn .3s cubic-bezier(.22,.68,0,1.45) forwards; }
-    .feedback .emoji { font-size: 3.5rem; animation: wobble .6s ease; }
+    .feedback.show { display: flex; animation: popIn .55s cubic-bezier(.22,.68,0,1.2) forwards; }
+    .feedback .emoji { font-size: 3.5rem; animation: wobble 1.0s ease; }
     .fb-stroke-img {
       width: auto; height: clamp(48px, 10vh, 80px);
       object-fit: contain;
       filter: drop-shadow(1px 2px 4px rgba(0,0,0,.15));
-      animation: wobble .6s ease;
+      animation: wobble 1.0s ease;
     }
     .fb-stroke-name {
       font-family: var(--font-zh);
@@ -386,9 +414,9 @@
     }
     @keyframes wobble {
       0%   { transform: rotate(0deg) scale(1); }
-      25%  { transform: rotate(-12deg) scale(1.15); }
-      50%  { transform: rotate(10deg) scale(1.1); }
-      75%  { transform: rotate(-6deg) scale(1.05); }
+      25%  { transform: rotate(-7deg) scale(1.09); }
+      50%  { transform: rotate(6deg) scale(1.06); }
+      75%  { transform: rotate(-3deg) scale(1.03); }
       100% { transform: rotate(0deg) scale(1); }
     }
     @keyframes bounce {
@@ -401,12 +429,50 @@
       from { opacity: 0; }
       to   { opacity: 1; }
     }
+    @keyframes selectedPulse {
+      0%, 100% { outline-offset: 1px;  outline-color: rgba(255,130,0,.55); }
+      50%       { outline-offset: 4px;  outline-color: rgba(255,130,0,.90); }
+    }
     @keyframes lineFlash {
       0%   { stroke-opacity: 1; }
       50%  { stroke-opacity: .2; }
       100% { stroke-opacity: 1; }
     }
     .line-flash { animation: lineFlash .4s ease 2; }
+
+    @keyframes coinFly {
+      0%   { transform: translateY(0) translateX(0) rotate(0deg) scale(1.6); opacity: 1; }
+      30%  { opacity: 1; }
+      70%  { opacity: .85; }
+      100% { transform: translateY(-180px) translateX(var(--cdx, 0px)) rotate(var(--crot, 360deg)) scale(.35); opacity: 0; }
+    }
+    @keyframes sparkFly {
+      0%   { transform: translate(0,0) scale(2.2) rotate(0deg); opacity: 1; }
+      55%  { opacity: .95; }
+      100% { transform: translate(var(--sdx), var(--sdy)) scale(0) rotate(var(--srot, 180deg)); opacity: 0; }
+    }
+    .coin-particle {
+      position: fixed; pointer-events: none; z-index: 9999;
+      font-size: 1.8rem; animation: coinFly 1.6s cubic-bezier(.22,.68,0,.98) forwards;
+      will-change: transform, opacity;
+    }
+    .spark-particle {
+      position: fixed; pointer-events: none; z-index: 9998;
+      animation: sparkFly 1.4s ease-out forwards;
+      will-change: transform, opacity;
+    }
+    .fb-timer {
+      font-size: .78rem; color: #888;
+      font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+      font-weight: 400; background: rgba(0,0,0,.06);
+      padding: 2px 10px; border-radius: 50px;
+    }
+    .level-complete-bar {
+      text-align: center; font-size: .88rem; font-weight: 800; color: #4a2c00;
+      background: linear-gradient(90deg, rgba(57,211,83,.15), rgba(255,130,0,.12), rgba(10,185,230,.15));
+      border-radius: 50px; padding: 3px 14px;
+      animation: fadeInOverlay .3s ease;
+    }
 
     /* ── Responsive ── */
     @media (max-width: 768px) {
@@ -446,7 +512,7 @@
     <header><h1 id="app-title">🖌️ 汉字连线练习</h1></header>
     <div class="level-badge lv1" id="level-badge">⭐ Level 1</div>
     <div class="scoreboard">
-      <span>✅ <span id="score-correct">0</span> / <span id="score-total">8</span></span>
+      <span>🪙 <span id="score-correct">0</span> / <span id="score-total">8</span></span>
       <span>❌ <span id="score-wrong">0</span></span>
     </div>
   </div>
@@ -459,9 +525,13 @@
       <button class="btn btn-primary"  onclick="retryLevel()"><span class="btn-label" data-full="🔁 Retry" data-short="🔁 Retry">🔁 Retry</span></button>
       <button class="btn btn-accent"   onclick="resetAll()"><span class="btn-label" data-full="🔄 Restart" data-short="🔄 Reset">🔄 Restart</span></button>
       <button class="btn btn-neutral"  onclick="toggleHelp()"><span class="btn-label" data-full="💡 Help" data-short="💡 Help">💡 Help</span></button>
+      <label class="celeb-toggle-wrap" onclick="toggleCelebration()" title="Celebration effects on/off">
+        🎉 <div class="toggle-track on" id="celeb-track"><div class="toggle-thumb"></div></div>
+      </label>
     </div>
     <div class="round-info" id="round-info">Loading…</div>
   </div>
+  <div class="level-complete-bar" id="level-complete-bar" style="display:none"></div>
 </div>
 
 <div class="game-wrapper" id="game-wrapper">
@@ -485,11 +555,12 @@
 
 <!-- Feedback popup -->
 <div class="feedback" id="feedback">
-  <div class="emoji" id="fb-emoji">✅</div>
+  <div class="emoji" id="fb-emoji"></div>
   <div class="fb-stroke-name" id="fb-name" style="display:none"></div>
   <img id="fb-img" class="fb-stroke-img" src="" alt="" style="display:none" />
   <div class="msg"   id="fb-msg">Correct!</div>
   <div class="sub"   id="fb-sub"></div>
+  <div class="fb-timer" id="fb-timer" style="display:none"></div>
 </div>
 
 <!-- Completion overlay -->
@@ -744,7 +815,7 @@ const PACK_MEASURE = {
         { left: card(null, '对'), right: card(null,           '花瓶')   },
         { left: card(null, '道'), right: card(null,           '菜')     },
         { left: card(null, '棵'), right: card(null,           '草')     },
-        { left: card(null, '面'), right: card(null,           '旗子')   },
+        { left: card(null, '面'), right: card('qí zi',        '旗子')   },
         { left: card(null, '袋'), right: card(null,           '面包')   },
         { left: card(null, '朵'), right: card(null,           '云')     },
         { left: card(null, '件'), right: card(null,           '事情')   },
@@ -752,14 +823,13 @@ const PACK_MEASURE = {
       ]
     },
     {
-      // 种 水果 | 匹 马 | 根 筷子 | 回 游戏 | 座 山 | 只 狼 | 双 鞋 | 套 衣服
+      // 匹 马 | 根 筷子 | 回 游戏 | 座 山 | 只 狼 | 双 鞋 | 套 衣服
       id: 3, cls: 'lv3',
       label:      '⭐⭐⭐ Level 3 — Measure Words 量词（三）',
       shortLabel: '⭐⭐⭐ Level 3',
       pairs: [
-        { left: card(null, '种'), right: card(null, '水果') },
         { left: card(null, '匹'), right: card(null, '马')   },
-        { left: card(null, '根'), right: card(null, '筷子') },
+        { left: card(null, '根'), right: card('kuài zi', '筷子') },
         { left: card(null, '回'), right: card(null, '游戏') },
         { left: card(null, '座'), right: card(null, '山')   },
         { left: card(null, '只'), right: card(null, '狼')   },
@@ -768,14 +838,13 @@ const PACK_MEASURE = {
       ]
     },
     {
-      // 种 东西 | 匹 布 | 根 绳子 | 回 老师 | 座 高楼 | 双 手 | 棵 菜 | 件 衣服
+      // 匹 布 | 根 绳子 | 回 老师 | 座 高楼 | 双 手 | 棵 菜 | 件 衣服
       id: 4, cls: 'lv4',
       label:      '⭐⭐⭐⭐ Level 4 — Measure Words 量词（四）',
       shortLabel: '⭐⭐⭐⭐ Level 4',
       pairs: [
-        { left: card(null, '种'), right: card(null, '东西') },
         { left: card(null, '匹'), right: card(null, '布')   },
-        { left: card(null, '根'), right: card(null, '绳子') },
+        { left: card(null, '根'), right: card('shéng zi', '绳子') },
         { left: card(null, '回'), right: card(null, '老师') },
         { left: card(null, '座'), right: card(null, '高楼') },
         { left: card(null, '双'), right: card(null, '手')   },
@@ -813,7 +882,6 @@ const PACK_MEASURE = {
         { left: card(null, '瓶'), right: card(null, '药')   },
         { left: card(null, '头'), right: card(null, '老虎') },
         { left: card(null, '根'), right: card(null, '玉米') },
-        { left: card(null, '种'), right: card(null, '动物') },
       ]
     },
     {
@@ -829,12 +897,12 @@ const PACK_MEASURE = {
         { left: card(null, '颗'), right: card(null, '葡萄') },
         { left: card(null, '瓶'), right: card(null, '油')   },
         { left: card(null, '头'), right: card(null, '骆驼') },
-        { left: card(null, '双'), right: card(null, '筷子') },
+        { left: card(null, '双'), right: card('kuài zi', '筷子') },
         { left: card(null, '座'), right: card(null, '房子') },
       ]
     },
     {
-      // 套 书 | 面 墙 | 根 线 | 双 脚 | 顶 伞 | 种 笔 | 匹 布 | 座 桥
+      // 套 书 | 面 墙 | 根 线 | 双 脚 | 顶 伞 | 匹 布 | 座 桥
       // 套↔书 (套↔衣服 was L3 — different level ✓)
       // 根↔线 (根↔筷子 L3, 根↔绳子 L4, 根↔玉米 L6 — no 双↔筷子 in same level since 双↔脚 here ✓)
       id: 8, cls: 'lv8',
@@ -842,11 +910,10 @@ const PACK_MEASURE = {
       shortLabel: '⭐⭐⭐⭐⭐⭐⭐⭐ Level 8',
       pairs: [
         { left: card(null, '套'), right: card(null, '书')   },
-        { left: card(null, '面'), right: card(null, '墙')   },
+        { left: card(null, '面'), right: card('qiáng',  '墙')   },
         { left: card(null, '根'), right: card(null, '线')   },
         { left: card(null, '双'), right: card(null, '脚')   },
         { left: card(null, '顶'), right: card(null, '伞')   },
-        { left: card(null, '种'), right: card(null, '笔')   },
         { left: card(null, '匹'), right: card(null, '布')   },
         { left: card(null, '座'), right: card(null, '桥')   },
       ]
@@ -865,7 +932,7 @@ const PACK_MEASURE = {
         { left: card(null, '片'), right: card(null, '海洋') },
         { left: card(null, '块'), right: card(null, '肉')   },
         { left: card(null, '道'), right: card(null, '题目') },
-        { left: card(null, '根'), right: card(null, '木棒') },
+        { left: card(null, '根'), right: card('mù bàng', '木棒') },
       ]
     },
     {
@@ -891,18 +958,19 @@ const PACK_MEASURE = {
       // 头 狮子 | 瓶 白糖 | 颗 小石子 | 群 羊 | 片 树林 | 片 肉 — conflict! use 片↔饼干
       // 头 牛 L9, 头 猪 L10 → 头 狮子 L11 ✓
       // 片↔饼干 (片↔叶子 L5, 片↔沙滩 L6, 片↔天空 L7, 片↔海洋 L9, 片↔草地 L10 — ✓)
+      // 顶↔蚊帐 (顶↔帽子 L1, 顶↔帐篷 L2, 顶↔伞 L8 — none here ✓)
       id: 11, cls: 'lv11',
       label:      '⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐ Level 11 — Measure Words 量词（十一）',
       shortLabel: '⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐ Level 11',
       pairs: [
-        { left: card(null, '头'), right: card(null, '狮子') },
-        { left: card(null, '瓶'), right: card(null, '白糖') },
+        { left: card(null, '头'), right: card(null, '狮子')  },
+        { left: card(null, '瓶'), right: card(null, '白糖')  },
         { left: card(null, '颗'), right: card(null, '小石子') },
-        { left: card(null, '群'), right: card(null, '羊')   },
-        { left: card(null, '片'), right: card(null, '饼干') },
-        { left: card(null, '种'), right: card(null, '菜')   },
-        { left: card(null, '道'), right: card(null, '线条') },
-        { left: card(null, '根'), right: card(null, '草')   },
+        { left: card(null, '群'), right: card(null, '羊')    },
+        { left: card(null, '片'), right: card(null, '饼干')  },
+        { left: card(null, '道'), right: card(null, '线条')  },
+        { left: card(null, '根'), right: card(null, '草')    },
+        { left: card(null, '顶'), right: card('wén zhàng', '蚊帐') },
       ]
     },
   ]
@@ -926,6 +994,10 @@ let wrongPairs      = new Set();
 let levelWrong      = 0;
 let feedbackTimer   = null;
 let drawingLine     = null;
+let matchStartTime  = null;
+let levelStartTime  = 0;
+let levelCoins      = 0;
+let celebrationOn   = true;  // toggle: fire particles on correct match
 
 /* ═══════════════════════════════════════════════════════════════
    UTILITIES
@@ -944,6 +1016,71 @@ function getDotCenter(el) {
   const wr = wrapper.getBoundingClientRect();
   const er = el.getBoundingClientRect();
   return { x: er.left + er.width / 2 - wr.left, y: er.top + er.height / 2 - wr.top };
+}
+
+/* Coin + spark burst when a pair is correctly matched.
+   Particles are appended to body and removed ONLY via animationend —
+   they are never cancelled by user interaction. */
+/* Spawn particles from the left and right card positions, biased outward to
+   each side so they never cross the center where the feedback popup sits. */
+function spawnCoins(lx, ly, rx, ry, celebEmoji = '🎉') {
+  const coinPool  = ['🪙', '💰'];
+  const sparkPool = ['✨', '🌟', '🪙', '💰', '✨', '🌟'];
+
+  // Helper: spawn one arc particle from (ox,oy) biased toward xDir (-1=left, +1=right)
+  function arc(ox, oy, emoji, cls, xDir, fs, dur, del, extraCss = '') {
+    const el = document.createElement('div');
+    el.className = cls;
+    el.textContent = emoji;
+    const cdx  = (xDir * (50 + Math.random() * 90)).toFixed(1);  // always fly outward
+    const crot = (Math.random() * 60 - 30).toFixed(0);
+    const jx   = (Math.random() - .5) * 30;
+    const jy   = (Math.random() - .5) * 30;
+    el.style.cssText =
+      `left:${ox + jx - 16}px; top:${oy + jy - 16}px;` +
+      `animation-duration:${dur}ms; animation-delay:${del}ms;` +
+      `--cdx:${cdx}px; --crot:${crot}deg; font-size:${fs}rem;` + extraCss;
+    document.body.appendChild(el);
+    el.addEventListener('animationend', () => el.remove());
+  }
+
+  // Helper: spawn one radial spark from (ox,oy) biased to the outer half
+  function spark(ox, oy, emoji, xDir, fs, dur, del) {
+    const el = document.createElement('div');
+    el.className = 'spark-particle';
+    el.textContent = emoji;
+    // angles in the outer 180° hemisphere (away from center)
+    const baseAngle = xDir < 0 ? 90 : 270;  // left side → 90°±, right → 270°±
+    const angle = baseAngle + (Math.random() - .5) * 160;
+    const dist  = 70 + Math.random() * 110;
+    const dx    = (Math.cos(angle * Math.PI / 180) * dist).toFixed(1);
+    const dy    = (Math.sin(angle * Math.PI / 180) * dist).toFixed(1);
+    const srot  = (Math.random() * 360 - 180).toFixed(0);
+    el.style.cssText =
+      `left:${ox - 10}px; top:${oy - 10}px;` +
+      `--sdx:${dx}px; --sdy:${dy}px; --srot:${srot}deg;` +
+      `font-size:${fs}rem; animation-duration:${dur}ms; animation-delay:${del}ms;`;
+    document.body.appendChild(el);
+    el.addEventListener('animationend', () => el.remove());
+  }
+
+  // Left side — 2 coins + 3 sparks
+  arc(lx, ly, coinPool[0], 'coin-particle', -1, (1.4 + Math.random()*.8).toFixed(2), 1300 + Math.random()*500, 0);
+  arc(lx, ly, coinPool[1], 'coin-particle', -1, (1.4 + Math.random()*.8).toFixed(2), 1300 + Math.random()*500, 90);
+  for (let i = 0; i < 3; i++)
+    spark(lx, ly, sparkPool[i], -1, (.9+Math.random()*.9).toFixed(2), 1100+Math.random()*600, Math.round(Math.random()*180));
+
+  // Right side — 2 coins + 3 sparks
+  arc(rx, ry, coinPool[0], 'coin-particle', +1, (1.4 + Math.random()*.8).toFixed(2), 1300 + Math.random()*500, 30);
+  arc(rx, ry, coinPool[1], 'coin-particle', +1, (1.4 + Math.random()*.8).toFixed(2), 1300 + Math.random()*500, 120);
+  for (let i = 0; i < 3; i++)
+    spark(rx, ry, sparkPool[i+3], +1, (.9+Math.random()*.9).toFixed(2), 1100+Math.random()*600, Math.round(Math.random()*180));
+
+  // One large face emoji — from whichever side has more vertical room, flying further out
+  const side = Math.random() < .5 ? {x: lx, d: -1} : {x: rx, d: +1};
+  arc(side.x, Math.min(ly, ry), celebEmoji, 'coin-particle', side.d,
+    (3.8 + Math.random()*.8).toFixed(2), 1800 + Math.random()*400, 60,
+    '--crot:0deg;');  // keep face upright
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -973,6 +1110,10 @@ function buildRound() {
   selectedLeft  = null;
   selectedRight = null;
   drawingLine   = null;
+  matchStartTime = null;
+  levelStartTime = Date.now();
+  levelCoins     = 0;
+  document.getElementById('level-complete-bar').style.display = 'none';
   renderColumns();
   clearSVG();
   updateLevelBadge();
@@ -1059,7 +1200,8 @@ function onLeftDown(e, pairIdx) {
   clearLeftSelection();
   removeDrawingLine();
 
-  selectedLeft = pairIdx;
+  selectedLeft  = pairIdx;
+  matchStartTime = Date.now();
   document.querySelector(`.left-card[data-pair-idx="${pairIdx}"]`).classList.add('selected');
 
   const dot    = document.getElementById(`dot-left-${pairIdx}`);
@@ -1069,17 +1211,23 @@ function onLeftDown(e, pairIdx) {
 
   const startX = e.clientX, startY = e.clientY;
   let isDrag = false;
+  let rafId = null;
+  let cachedWr = document.getElementById('game-wrapper').getBoundingClientRect();
 
   function onMove(ev) {
     if (!drawingLine) return;
-    const wr = document.getElementById('game-wrapper').getBoundingClientRect();
-    setLinePath(drawingLine, origin.x, origin.y, ev.clientX - wr.left, ev.clientY - wr.top);
     if (!isDrag && (Math.abs(ev.clientX - startX) > 8 || Math.abs(ev.clientY - startY) > 8)) isDrag = true;
+    if (rafId) return;
+    rafId = requestAnimationFrame(() => {
+      rafId = null;
+      if (drawingLine) setLinePath(drawingLine, origin.x, origin.y, ev.clientX - cachedWr.left, ev.clientY - cachedWr.top);
+    });
   }
 
   function onUp(ev) {
     window.removeEventListener('pointermove', onMove);
     window.removeEventListener('pointerup',   onUp);
+    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
 
     const el        = document.elementFromPoint(ev.clientX, ev.clientY);
     const rightCard = el && el.closest('.right-card');
@@ -1099,7 +1247,7 @@ function onLeftDown(e, pairIdx) {
     if (isDrag) clearLeftSelection();
   }
 
-  window.addEventListener('pointermove', onMove);
+  window.addEventListener('pointermove', onMove, { passive: true });
   window.addEventListener('pointerup',   onUp);
 }
 
@@ -1125,7 +1273,8 @@ function onRightDown(e, rightPairIdx) {
   clearRightSelection();
   removeDrawingLine();
 
-  selectedRight = rightPairIdx;
+  selectedRight  = rightPairIdx;
+  matchStartTime  = Date.now();
   document.querySelector(`.right-card[data-pair-idx="${rightPairIdx}"]`).classList.add('selected');
 
   const dot    = document.getElementById(`dot-right-${rightPairIdx}`);
@@ -1135,17 +1284,23 @@ function onRightDown(e, rightPairIdx) {
 
   const startX = e.clientX, startY = e.clientY;
   let isDrag = false;
+  let rafId = null;
+  let cachedWr = document.getElementById('game-wrapper').getBoundingClientRect();
 
   function onMove(ev) {
     if (!drawingLine) return;
-    const wr = document.getElementById('game-wrapper').getBoundingClientRect();
-    setLinePath(drawingLine, ev.clientX - wr.left, ev.clientY - wr.top, origin.x, origin.y);
     if (!isDrag && (Math.abs(ev.clientX - startX) > 8 || Math.abs(ev.clientY - startY) > 8)) isDrag = true;
+    if (rafId) return;
+    rafId = requestAnimationFrame(() => {
+      rafId = null;
+      if (drawingLine) setLinePath(drawingLine, ev.clientX - cachedWr.left, ev.clientY - cachedWr.top, origin.x, origin.y);
+    });
   }
 
   function onUp(ev) {
     window.removeEventListener('pointermove', onMove);
     window.removeEventListener('pointerup',   onUp);
+    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
 
     const el       = document.elementFromPoint(ev.clientX, ev.clientY);
     const leftCard = el && el.closest('.left-card');
@@ -1165,7 +1320,7 @@ function onRightDown(e, rightPairIdx) {
     if (isDrag) clearRightSelection();
   }
 
-  window.addEventListener('pointermove', onMove);
+  window.addEventListener('pointermove', onMove, { passive: true });
   window.addEventListener('pointerup',   onUp);
 }
 
@@ -1193,16 +1348,26 @@ function attemptConnect(leftPairIdx, rightPairIdx, correct) {
   const rightDot = document.getElementById(`dot-right-${rightPairIdx}`);
   const p1 = getDotCenter(leftDot);
   const p2 = getDotCenter(rightDot);
+  const elapsedMs = matchStartTime ? Date.now() - matchStartTime : 0;
+  matchStartTime  = null;
 
   if (correct) {
     connections[leftPairIdx] = rightPairIdx;
+    levelCoins++;
     const line = makeLine('line-correct');
     setLinePath(line, p1.x, p1.y, p2.x, p2.y);
+    // Spawn coins at screen midpoint of the connection
+    if (celebrationOn) {
+      const wr = document.getElementById('game-wrapper').getBoundingClientRect();
+      const CELEB_POOL = ['🎉', '🥳', '😄', '😀', '😎', '🤩', '🙃', '😜'];
+      const celebEmoji = CELEB_POOL[Math.floor(Math.random() * CELEB_POOL.length)];
+      spawnCoins(wr.left + p1.x, wr.top + p1.y, wr.left + p2.x, wr.top + p2.y, celebEmoji);
+    }
     document.querySelector(`.left-card[data-pair-idx="${leftPairIdx}"]`).classList.add('matched');
     document.querySelector(`.right-card[data-pair-idx="${rightPairIdx}"]`).classList.add('matched');
-    showFeedback(true, currentPairs[leftPairIdx]);
+    showFeedback(true, currentPairs[leftPairIdx], elapsedMs);
     updateScoreboard();
-    if (Object.keys(connections).length === currentPairs.length) setTimeout(showRoundComplete, 800);
+    if (Object.keys(connections).length === currentPairs.length) setTimeout(showRoundComplete, 950);
   } else {
     levelWrong++;
     const key = `${leftPairIdx}-${rightPairIdx}`;
@@ -1217,7 +1382,7 @@ function attemptConnect(leftPairIdx, rightPairIdx, correct) {
       const c = document.querySelector(`.${cls}[data-pair-idx="${idx}"]`);
       if (c) { c.classList.add('wrong'); setTimeout(() => c.classList.remove('wrong'), 400); }
     });
-    showFeedback(false);
+    showFeedback(false, null, 0);
     updateScoreboard();
   }
 }
@@ -1225,11 +1390,18 @@ function attemptConnect(leftPairIdx, rightPairIdx, correct) {
 /* ═══════════════════════════════════════════════════════════════
    FEEDBACK
 ═══════════════════════════════════════════════════════════════ */
-function showFeedback(correct, pair) {
+function showFeedback(correct, pair = null, elapsedMs = 0) {
   clearTimeout(feedbackTimer);
   const fb = document.getElementById('feedback');
-  document.getElementById('fb-emoji').textContent = correct ? '🎉' : '❌';
-  document.getElementById('fb-msg').textContent   = correct ? 'Correct! 正确！' : 'Try again! 再试试！';
+
+  const CORRECT_MSGS = [
+    'Correct! 正确！', 'Nice! 好棒！', 'Great! 太棒！',
+    'Perfect! 完美！', 'Awesome! 厉害！', 'Brilliant! 真聪明！'
+  ];
+
+  const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+  document.getElementById('fb-emoji').textContent = correct ? '' : '❌';
+  document.getElementById('fb-msg').textContent   = correct ? pick(CORRECT_MSGS) : 'Try again! 再试试！';
 
   if (correct && pair) {
     const l = pair.left, r = pair.right;
@@ -1239,6 +1411,8 @@ function showFeedback(correct, pair) {
     const fbSubEl = document.getElementById('fb-sub');
     const pack = GAME_PACKS[currentPackIdx];
 
+    // Celebration emoji is launched as a particle — hide it from the popup
+    document.getElementById('fb-emoji').style.display = 'none';
     if (imgSrc) {
       fbImg.src = imgSrc;
       fbImg.alt = l.chinese || r.chinese || '';
@@ -1246,10 +1420,8 @@ function showFeedback(correct, pair) {
       fbImg.style.animation = 'none';
       fbImg.offsetWidth;
       fbImg.style.animation = '';
-      document.getElementById('fb-emoji').style.display = 'none';
     } else {
       fbImg.style.display = 'none';
-      document.getElementById('fb-emoji').style.display = '';
     }
 
     if (pack.id === 'strokes') {
@@ -1278,6 +1450,15 @@ function showFeedback(correct, pair) {
     const fbSubEl = document.getElementById('fb-sub');
     fbSubEl.classList.remove('zh-phrase');
     fbSubEl.textContent = "That doesn't match — try a different pair.";
+  }
+
+  // Per-match timer badge
+  const fbTimer = document.getElementById('fb-timer');
+  if (correct && elapsedMs > 0) {
+    fbTimer.textContent = `⏱ ${(elapsedMs / 1000).toFixed(1)}s`;
+    fbTimer.style.display = '';
+  } else {
+    fbTimer.style.display = 'none';
   }
 
   fb.classList.add('show');
@@ -1348,10 +1529,15 @@ function showRoundComplete() {
   document.getElementById('co-stars').textContent = stars;
   document.getElementById('co-title').textContent = isLast ? '全部完成！All Done!' : '太棒了！Great job!';
 
+  const totalSecs = ((Date.now() - levelStartTime) / 1000).toFixed(1);
   const nextLv = !isLast ? pack.levels[currentLevel + 1] : null;
   document.getElementById('co-stats').textContent = isLast
-    ? `All ${matched} pairs mastered! 🎊`
-    : `Accuracy: ${accuracy}%  |  Mistakes: ${levelWrong}  |  Next: ${nextLv.shortLabel}`;
+    ? `All ${matched} pairs mastered! 🎊  ⏱ ${totalSecs}s`
+    : `Accuracy: ${accuracy}%  |  Mistakes: ${levelWrong}  |  ⏱ ${totalSecs}s`;
+  // Show coin + time summary in top header
+  const bar = document.getElementById('level-complete-bar');
+  bar.innerHTML = `🪙 ${levelCoins} coin${levelCoins !== 1 ? 's' : ''} collected &nbsp;·&nbsp; ⏱ ${totalSecs}s total`;
+  bar.style.display = '';
 
   const btn = document.getElementById('co-btn');
   if (isLast) {
@@ -1385,6 +1571,10 @@ function retryLevel() {
   levelWrong   = 0;
   selectedLeft  = null;
   selectedRight = null;
+  matchStartTime = null;
+  levelStartTime = Date.now();
+  levelCoins     = 0;
+  document.getElementById('level-complete-bar').style.display = 'none';
   renderColumns();
   updateRoundInfo();
   updateScoreboard();
@@ -1434,6 +1624,11 @@ function loadPack(idx) {
 /* ═══════════════════════════════════════════════════════════════
    HELP
 ═══════════════════════════════════════════════════════════════ */
+function toggleCelebration() {
+  celebrationOn = !celebrationOn;
+  document.getElementById('celeb-track').classList.toggle('on', celebrationOn);
+}
+
 function toggleHelp() {
   alert(
     '📖 HOW TO PLAY\n\n' +
