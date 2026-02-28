@@ -119,6 +119,33 @@
       cursor: pointer; user-select: none;
       white-space: nowrap;
     }
+    .sound-toggle-wrap {
+      display: flex; align-items: center; gap: 6px;
+      font-size: .8rem; font-weight: 800; color: #4a2c00;
+      background: rgba(255,255,255,.65); padding: 4px 10px 4px 8px; border-radius: 50px;
+      border: 2px solid rgba(255,255,255,.8);
+      cursor: pointer; user-select: none;
+      white-space: nowrap;
+    }
+    /* ── Digital clock timer ── */
+    .clock-display {
+      font-family: 'Courier New', 'Lucida Console', monospace;
+      font-size: 1rem; font-weight: 900;
+      letter-spacing: .08em;
+      color: #4a2c00;
+      background: rgba(255,255,255,.75);
+      padding: 3px 12px;
+      border-radius: 50px;
+      border: 2px solid rgba(255,255,255,.85);
+      cursor: pointer;
+      user-select: none;
+      min-width: 62px;
+      text-align: center;
+      transition: color .2s, background .2s, border-color .2s;
+      box-shadow: 0 2px 8px rgba(0,0,0,.10);
+    }
+    .clock-display.ticking { color: #1a8a2a; border-color: rgba(57,211,83,.5); }
+    .clock-display.muted   { color: #aaa;    border-color: rgba(0,0,0,.10); }
     .toggle-track {
       width: 36px; height: 20px; border-radius: 10px;
       background: #bbb; position: relative; transition: background .22s;
@@ -517,6 +544,7 @@
       <span>      <span id="score-coin-icon">⭐</span> <span id="score-correct">0</span> / <span id="score-total">8</span></span>
       <span>❌ <span id="score-wrong">0</span></span>
     </div>
+    <div class="clock-display muted" id="clock-display" title="Click to mute/unmute tick">0s</div>
   </div>
   <div class="progress-wrap">
     <div class="progress-bar" id="progress-bar" style="width:0%"></div>
@@ -529,6 +557,9 @@
       <button class="btn btn-neutral"  onclick="toggleHelp()"><span class="btn-label" data-full="💡 Help" data-short="💡 Help">💡 Help</span></button>
       <label class="celeb-toggle-wrap" onclick="toggleCelebration()" title="Celebration effects on/off">
         🎉 <div class="toggle-track" id="celeb-track"><div class="toggle-thumb"></div></div>
+      </label>
+      <label class="sound-toggle-wrap" onclick="toggleSound()" title="Sound effects on/off">
+        🔊 <div class="toggle-track on" id="sound-track"><div class="toggle-thumb"></div></div>
       </label>
     </div>
     <div class="round-info" id="round-info">Loading…</div>
@@ -1000,8 +1031,158 @@ let matchStartTime  = null;
 let levelStartTime  = 0;
 let levelCoins      = 0;
 let celebrationOn   = false;  // toggle: fire particles on correct match
+let soundOn         = true;   // toggle: sound effects
 const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent) ||
               (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+/* ═══════════════════════════════════════════════════════════════
+   AUDIO ENGINE  (Web Audio API — no files, no external service)
+═══════════════════════════════════════════════════════════════ */
+const _AudioCtx = window.AudioContext || window.webkitAudioContext;
+let _actx = null;
+
+function _getCtx() {
+  if (!_actx) _actx = new _AudioCtx();
+  if (_actx.state === 'suspended') _actx.resume();
+  return _actx;
+}
+
+// Schedule a single tone: osc type, frequency, start time, duration, peak volume
+function _tone(ctx, dest, type, freq, t, dur, vol) {
+  const osc  = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, t);
+  gain.gain.setValueAtTime(0, t);
+  gain.gain.linearRampToValueAtTime(vol, t + 0.012);
+  gain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  osc.connect(gain);
+  gain.connect(dest);
+  osc.start(t);
+  osc.stop(t + dur + 0.05);
+}
+
+// ✅ Correct match — warm ascending marimba chime (C5 → E5 → G5)
+function playCorrect() {
+  if (!soundOn) return;
+  const ctx    = _getCtx();
+  const master = ctx.createGain();
+  master.gain.setValueAtTime(0.22, ctx.currentTime);
+  master.connect(ctx.destination);
+  const t = ctx.currentTime;
+  _tone(ctx, master, 'triangle', 523.25, t,        0.38, 1.0);
+  _tone(ctx, master, 'triangle', 659.25, t + 0.11, 0.33, 1.0);
+  _tone(ctx, master, 'triangle', 783.99, t + 0.22, 0.42, 1.0);
+  // Soft high shimmer on the last note
+  _tone(ctx, master, 'sine',    1046.50, t + 0.22, 0.28, 0.28);
+}
+
+// ❌ Wrong match — two sawtooth "mm-mm" buzzes, descending pitch each pulse
+function playWrong() {
+  if (!soundOn) return;
+  const ctx    = _getCtx();
+  const master = ctx.createGain();
+  master.gain.setValueAtTime(0.18, ctx.currentTime);
+  master.connect(ctx.destination);
+  const t = ctx.currentTime;
+
+  // Two buzz pulses: higher then lower, like "mm-mm / nuh-uh"
+  [{ startF: 240, endF: 180, start: 0 },
+   { startF: 190, endF: 130, start: 0.23 }].forEach(({ startF, endF, start }) => {
+    const osc  = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(startF, t + start);
+    osc.frequency.exponentialRampToValueAtTime(endF, t + start + 0.18);
+    gain.gain.setValueAtTime(0, t + start);
+    gain.gain.linearRampToValueAtTime(1, t + start + 0.012);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + start + 0.20);
+    osc.connect(gain);
+    gain.connect(master);
+    osc.start(t + start);
+    osc.stop(t + start + 0.25);
+  });
+}
+
+// 🎉 Level complete — C major fanfare arpeggio then chord sustain
+function playComplete() {
+  if (!soundOn) return;
+  const ctx    = _getCtx();
+  const master = ctx.createGain();
+  master.gain.setValueAtTime(0.18, ctx.currentTime);
+  master.connect(ctx.destination);
+  const t = ctx.currentTime;
+  // Quick arpeggio: C5 E5 G5 C6
+  [523.25, 659.25, 783.99, 1046.50].forEach((f, i) =>
+    _tone(ctx, master, 'triangle', f, t + i * 0.10, 0.50, 1.0)
+  );
+  // Warm chord sustain underneath
+  [523.25, 659.25, 783.99].forEach(f =>
+    _tone(ctx, master, 'sine', f, t + 0.42, 0.65, 0.45)
+  );
+}
+
+function toggleSound() {
+  soundOn = !soundOn;
+  document.getElementById('sound-track').classList.toggle('on', soundOn);
+  // Unlock AudioContext on first interaction (required by iOS/Chrome policy)
+  if (soundOn) _getCtx();
+}
+
+let _tickInterval  = null;
+let _tickMuted     = false;   // clock visible but tick sound silenced
+let _tickStarted   = false;   // becomes true after first card tap
+
+function playTick() {
+  if (!soundOn || _tickMuted) return;
+  const ctx  = _getCtx();
+  const t    = ctx.currentTime;
+  const osc  = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(1200, t);
+  osc.frequency.exponentialRampToValueAtTime(800, t + 0.025);
+  gain.gain.setValueAtTime(0, t);
+  gain.gain.linearRampToValueAtTime(0.18, t + 0.004);
+  gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.045);
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.start(t);
+  osc.stop(t + 0.05);
+}
+
+function _updateClock() {
+  const el = document.getElementById('clock-display');
+  if (!el) return;
+  const secs = Math.floor((Date.now() - levelStartTime) / 1000);
+  el.textContent = secs + 's';
+}
+
+function startTick() {
+  stopTick();
+  _tickStarted = true;
+  levelStartTime = Date.now();
+  const el = document.getElementById('clock-display');
+  if (el) { el.classList.remove('muted'); el.classList.add('ticking'); }
+  _updateClock();
+  playTick();
+  _tickInterval = setInterval(() => { _updateClock(); playTick(); }, 1000);
+}
+
+function stopTick() {
+  if (_tickInterval) { clearInterval(_tickInterval); _tickInterval = null; }
+  _tickStarted = false;
+  const el = document.getElementById('clock-display');
+  if (el) { el.classList.remove('ticking'); el.classList.add('muted'); }
+}
+
+// Clock widget click — toggle tick mute while keeping clock running
+function toggleTickMute() {
+  if (!_tickStarted) return;  // clock not active yet, nothing to toggle
+  _tickMuted = !_tickMuted;
+  const el = document.getElementById('clock-display');
+  if (el) el.classList.toggle('muted', _tickMuted);
+}
 
 /* ═══════════════════════════════════════════════════════════════
    UTILITIES
@@ -1116,9 +1297,11 @@ function buildRound() {
   selectedRight = null;
   drawingLine   = null;
   matchStartTime = null;
-  levelStartTime = Date.now();
+  levelStartTime = 0;
   levelCoins     = 0;
   document.getElementById('level-complete-bar').style.display = 'none';
+  const clk = document.getElementById('clock-display');
+  if (clk) { clk.textContent = '0s'; clk.classList.remove('ticking'); clk.classList.add('muted'); }
   renderColumns();
   clearSVG();
   updateLevelBadge();
@@ -1207,6 +1390,7 @@ function onLeftDown(e, pairIdx) {
 
   selectedLeft  = pairIdx;
   matchStartTime = Date.now();
+  if (!_tickStarted) startTick();
   document.querySelector(`.left-card[data-pair-idx="${pairIdx}"]`).classList.add('selected');
 
   const dot    = document.getElementById(`dot-left-${pairIdx}`);
@@ -1280,6 +1464,7 @@ function onRightDown(e, rightPairIdx) {
 
   selectedRight  = rightPairIdx;
   matchStartTime  = Date.now();
+  if (!_tickStarted) startTick();
   document.querySelector(`.right-card[data-pair-idx="${rightPairIdx}"]`).classList.add('selected');
 
   const dot    = document.getElementById(`dot-right-${rightPairIdx}`);
@@ -1371,6 +1556,7 @@ function attemptConnect(leftPairIdx, rightPairIdx, correct) {
     document.querySelector(`.left-card[data-pair-idx="${leftPairIdx}"]`).classList.add('matched');
     document.querySelector(`.right-card[data-pair-idx="${rightPairIdx}"]`).classList.add('matched');
     showFeedback(true, currentPairs[leftPairIdx], elapsedMs);
+    playCorrect();
     updateScoreboard();
     if (Object.keys(connections).length === currentPairs.length) setTimeout(showRoundComplete, 950);
   } else {
@@ -1388,6 +1574,7 @@ function attemptConnect(leftPairIdx, rightPairIdx, correct) {
       if (c) { c.classList.add('wrong'); setTimeout(() => c.classList.remove('wrong'), 400); }
     });
     showFeedback(false, null, 0);
+    playWrong();
     updateScoreboard();
   }
 }
@@ -1554,6 +1741,8 @@ function showRoundComplete() {
   }
 
   document.getElementById('complete-overlay').classList.add('show');
+  stopTick();
+  playComplete();
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -1577,9 +1766,11 @@ function retryLevel() {
   selectedLeft  = null;
   selectedRight = null;
   matchStartTime = null;
-  levelStartTime = Date.now();
+  levelStartTime = 0;
   levelCoins     = 0;
   document.getElementById('level-complete-bar').style.display = 'none';
+  const clk = document.getElementById('clock-display');
+  if (clk) { clk.textContent = '0s'; clk.classList.remove('ticking'); clk.classList.add('muted'); }
   renderColumns();
   updateRoundInfo();
   updateScoreboard();
@@ -1587,6 +1778,7 @@ function retryLevel() {
 
 function resetAll() {
   document.getElementById('complete-overlay').classList.remove('show');
+  stopTick();
   currentLevel = 0;
   levelWrong   = 0;
   buildRound();
@@ -1671,6 +1863,7 @@ window.addEventListener('resize', () => {
 ═══════════════════════════════════════════════════════════════ */
 // Set scoreboard coin icon based on platform
 document.getElementById('score-coin-icon').textContent = isIOS ? '⭐' : '🪙';
+document.getElementById('clock-display').addEventListener('click', toggleTickMute);
 buildRound();
 </script>
 </body>
