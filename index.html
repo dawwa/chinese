@@ -514,7 +514,7 @@
     <header><h1 id="app-title">🖌️ 汉字连线练习</h1></header>
     <div class="level-badge lv1" id="level-badge">⭐ Level 1</div>
     <div class="scoreboard">
-      <span>🪙 <span id="score-correct">0</span> / <span id="score-total">8</span></span>
+      <span>      <span id="score-coin-icon">⭐</span> <span id="score-correct">0</span> / <span id="score-total">8</span></span>
       <span>❌ <span id="score-wrong">0</span></span>
     </div>
   </div>
@@ -1000,6 +1000,8 @@ let matchStartTime  = null;
 let levelStartTime  = 0;
 let levelCoins      = 0;
 let celebrationOn   = false;  // toggle: fire particles on correct match
+const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent) ||
+              (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
 /* ═══════════════════════════════════════════════════════════════
    UTILITIES
@@ -1026,8 +1028,9 @@ function getDotCenter(el) {
 /* Spawn particles from the left and right card positions, biased outward to
    each side so they never cross the center where the feedback popup sits. */
 function spawnCoins(lx, ly, rx, ry, celebEmoji = '🎉') {
-  const coinPool  = ['🪙', '💰'];
-  const sparkPool = ['✨', '🌟', '🪙', '💰', '✨', '🌟'];
+  const coinPool  = isIOS ? ['⭐', '🌟'] : ['🪙', '💰'];
+  const sparkPool = isIOS ? ['✨', '🌟', '⭐', '🌟', '✨', '⭐']
+                          : ['✨', '🌟', '🪙', '💰', '✨', '🌟'];
 
   // Helper: spawn one arc particle from (ox,oy) biased toward xDir (-1=left, +1=right)
   function arc(ox, oy, emoji, cls, xDir, fs, dur, del, extraCss = '') {
@@ -1666,6 +1669,8 @@ window.addEventListener('resize', () => {
 /* ═══════════════════════════════════════════════════════════════
    INIT
 ═══════════════════════════════════════════════════════════════ */
+// Set scoreboard coin icon based on platform
+document.getElementById('score-coin-icon').textContent = isIOS ? '⭐' : '🪙';
 buildRound();
 </script>
 </body>
