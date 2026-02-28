@@ -285,14 +285,16 @@
       border-radius: 28px;
       padding: 20px 32px; text-align: center;
       box-shadow: 0 12px 40px rgba(0,0,0,.18);
-      z-index: 100; display: none; flex-direction: column; align-items: center; gap: 12px;
+      z-index: 100; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
       cursor: pointer;
       border: 2px solid rgba(244,132,95,.25);
+      width: 270px;
+      min-height: 210px;
     }
     .feedback.show { display: flex; animation: popIn .55s cubic-bezier(.22,.68,0,1.2) forwards; }
     .feedback .emoji { font-size: 3.5rem; animation: wobble 1.0s ease; }
     .fb-stroke-img {
-      width: auto; height: clamp(48px, 10vh, 80px);
+      width: 100px; height: clamp(48px, 10vh, 80px);
       object-fit: contain;
       filter: drop-shadow(1px 2px 4px rgba(0,0,0,.15));
       animation: wobble 1.0s ease;
@@ -312,7 +314,7 @@
       font-size: .95rem;
       color: #888;
     }
-    .feedback .msg   { font-size: 1.2rem; font-weight: 600; color: #4a2c00; font-family: 'Segoe UI', Tahoma, Arial, sans-serif; white-space: nowrap; }
+    .feedback .msg   { font-size: 1.2rem; font-weight: 600; color: #4a2c00; font-family: 'Segoe UI', Tahoma, Arial, sans-serif; }
     .feedback .sub   { font-size: .95rem; color: #7a4500; font-weight: 400; font-family: 'Segoe UI', Tahoma, Arial, sans-serif; }
     .feedback .sub.zh-phrase { font-family: var(--font-zh); font-size: 1.2rem; font-weight: 700; color: #4a2c00; letter-spacing: .06em; }
 
@@ -526,7 +528,7 @@
       <button class="btn btn-accent"   onclick="resetAll()"><span class="btn-label" data-full="🔄 Restart" data-short="🔄 Reset">🔄 Restart</span></button>
       <button class="btn btn-neutral"  onclick="toggleHelp()"><span class="btn-label" data-full="💡 Help" data-short="💡 Help">💡 Help</span></button>
       <label class="celeb-toggle-wrap" onclick="toggleCelebration()" title="Celebration effects on/off">
-        🎉 <div class="toggle-track on" id="celeb-track"><div class="toggle-thumb"></div></div>
+        🎉 <div class="toggle-track" id="celeb-track"><div class="toggle-thumb"></div></div>
       </label>
     </div>
     <div class="round-info" id="round-info">Loading…</div>
@@ -997,7 +999,7 @@ let drawingLine     = null;
 let matchStartTime  = null;
 let levelStartTime  = 0;
 let levelCoins      = 0;
-let celebrationOn   = true;  // toggle: fire particles on correct match
+let celebrationOn   = false;  // toggle: fire particles on correct match
 
 /* ═══════════════════════════════════════════════════════════════
    UTILITIES
