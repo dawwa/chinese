@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Noto+Serif+SC:wght@700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css?v=3" />
+  <link rel="stylesheet" href="css/styles.css?v=5" />
   <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 </head>
 <body>
@@ -72,21 +72,20 @@
     <div class="radical-progress" id="radical-progress">1 / 1</div>
     <div class="radical-card">
       <div class="radical-writer" id="radical-writer"></div>
-      <div class="radical-name-group hidden" id="radical-name-group">
-        <div class="radical-name-placeholder" onclick="toggleRadicalName()">··· 这是什么部首？ What's this radical? ···</div>
+      <div class="radical-name-group hidden" id="radical-name-group" onclick="toggleRadicalName()">
+        <button class="reveal-icon" id="reveal-name-btn" type="button" aria-label="Toggle name">🙈</button>
+        <div class="radical-name-placeholder">··· 这是什么部首？ What's this radical? ···</div>
         <div class="radical-pinyin" id="radical-pinyin"></div>
         <div class="radical-name-cn" id="radical-name-cn"></div>
       </div>
       <div class="radical-examples-label">例字 Examples</div>
-      <div class="radical-examples hidden" id="radical-examples">
-        <div class="radical-examples-placeholder" onclick="toggleRadicalExamples()">··· 点击查看 Tap to reveal ···</div>
+      <div class="radical-examples hidden" id="radical-examples" onclick="toggleRadicalExamples()">
+        <button class="reveal-icon" id="reveal-examples-btn" type="button" aria-label="Toggle examples">🙈</button>
+        <div class="radical-examples-placeholder">··· 点击查看 Tap to reveal ···</div>
       </div>
     </div>
     <div class="radical-controls">
       <button class="btn btn-neutral" onclick="radicalPrev()">◀ Prev</button>
-      <button class="btn btn-accent"  onclick="radicalReplay()">🔁 Replay</button>
-      <button class="btn btn-switch"  id="reveal-name-btn"     onclick="toggleRadicalName()">🏷️ Name</button>
-      <button class="btn btn-switch"  id="reveal-examples-btn" onclick="toggleRadicalExamples()">👀 Examples</button>
       <button class="btn btn-primary" onclick="radicalNext()">Next ▶</button>
     </div>
   </div>
@@ -135,12 +134,12 @@
 </div>
 
 <!-- App scripts (load order matters: utils → packs → audio → matching → radicals → selector → main) -->
-<script src="js/utils.js?v=2"></script>
-<script src="js/packs.js?v=2"></script>
-<script src="js/audio.js?v=2"></script>
-<script src="js/matching.js?v=2"></script>
-<script src="js/radicals.js?v=2"></script>
-<script src="js/selector.js?v=2"></script>
-<script src="js/main.js?v=2"></script>
+<script src="js/utils.js?v=5"></script>
+<script src="js/packs.js?v=5"></script>
+<script src="js/audio.js?v=5"></script>
+<script src="js/matching.js?v=5"></script>
+<script src="js/radicals.js?v=5"></script>
+<script src="js/selector.js?v=5"></script>
+<script src="js/main.js?v=5"></script>
 </body>
 </html>

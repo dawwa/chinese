@@ -19,20 +19,15 @@ function renderRadical() {
   const nameGroup = document.getElementById('radical-name-group');
   if (nameGroup) nameGroup.classList.add('hidden');
   const nameBtn = document.getElementById('reveal-name-btn');
-  if (nameBtn) nameBtn.innerHTML = '🏷️ Name';
+  if (nameBtn) nameBtn.textContent = '🙈';
 
   const examplesEl = document.getElementById('radical-examples');
   // Reset to hidden state for each new radical
   examplesEl.classList.add('hidden');
   const btn = document.getElementById('reveal-examples-btn');
-  if (btn) btn.innerHTML = '👀 Examples';
-  // Rebuild contents: placeholder + chips
-  examplesEl.innerHTML = '';
-  const placeholder = document.createElement('div');
-  placeholder.className = 'radical-examples-placeholder';
-  placeholder.textContent = '··· 点击查看 Tap to reveal ···';
-  placeholder.onclick = toggleRadicalExamples;
-  examplesEl.appendChild(placeholder);
+  if (btn) btn.textContent = '🙈';
+  // Rebuild examples chips, preserving the corner reveal-icon button + placeholder
+  examplesEl.querySelectorAll('.radical-example').forEach(n => n.remove());
   (item.examples || []).forEach(ch => {
     const span = document.createElement('span');
     span.className = 'radical-example';
@@ -110,10 +105,10 @@ function radicalPrev() {
 }
 
 function radicalReplay() {
+  // No longer surfaced in UI — stroke loop runs continuously — kept for compatibility.
   if (!radicalWriter) return;
   radicalLoopActive = true;
   const item = radicalItems[radicalIdx];
-  // Hide any in-progress strokes, then re-run our chained animator
   try { radicalWriter.hideCharacter({ duration: 0 }); } catch (e) {}
   radicalAnimateLoop(item.char);
 }
@@ -123,7 +118,7 @@ function toggleRadicalExamples() {
   const btn = document.getElementById('reveal-examples-btn');
   const wasHidden = el.classList.contains('hidden');
   el.classList.toggle('hidden');
-  if (btn) btn.innerHTML = wasHidden ? '🙈 Examples' : '👀 Examples';
+  if (btn) btn.textContent = wasHidden ? '👀' : '🙈';
 }
 
 function toggleRadicalName() {
@@ -132,7 +127,7 @@ function toggleRadicalName() {
   if (!el) return;
   const wasHidden = el.classList.contains('hidden');
   el.classList.toggle('hidden');
-  if (btn) btn.innerHTML = wasHidden ? '🙈 Name' : '🏷️ Name';
+  if (btn) btn.textContent = wasHidden ? '👀' : '🙈';
 }
 
 // Chain animateStroke() one stroke at a time so we can play a sound per stroke.

@@ -357,6 +357,8 @@ header h1 {
 .radical-name-group {
   display: flex; flex-direction: column; align-items: center; gap: 2px;
   min-height: 70px; justify-content: center;
+  position: relative; cursor: pointer;
+  padding: 4px 36px;
 }
 .radical-name-group.hidden .radical-pinyin,
 .radical-name-group.hidden .radical-name-cn { display: none; }
@@ -384,7 +386,22 @@ header h1 {
 .radical-examples {
   display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
   margin-top: 4px; min-height: 50px; align-items: center;
+  position: relative; cursor: pointer;
+  padding: 4px 36px;
 }
+.reveal-icon {
+  position: absolute; top: 4px; right: 6px;
+  width: 30px; height: 30px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.05rem; line-height: 1;
+  background: rgba(255,255,255,.85);
+  border: 2px solid var(--sw-blue);
+  border-radius: 50%;
+  cursor: pointer; padding: 0;
+  box-shadow: 0 1px 3px rgba(0,0,0,.15);
+  transition: transform .15s;
+}
+.reveal-icon:active { transform: scale(.92); }
 .radical-examples.hidden .radical-example { display: none; }
 .radical-examples-placeholder {
   display: none;
