@@ -303,6 +303,9 @@
     .level-badge.lv9  { background: #2ECC71; color: #fff; }
     .level-badge.lv10 { background: #F39C12; color: #fff; }
     .level-badge.lv11 { background: #8E44AD; color: #fff; }
+    .level-badge.lv12 { background: #16A085; color: #fff; }
+    .level-badge.lv13 { background: #C0392B; color: #fff; }
+    .level-badge.lv14 { background: #2980B9; color: #fff; }
 
     /* ── Feedback popup ── */
     .feedback {
@@ -405,6 +408,27 @@
     .pack-name  { font-size: 1.05rem; font-weight: 900; color: #4a2c00; }
     .pack-desc  { font-size: .84rem; color: #666; margin-top: 2px; font-weight: 700; }
     .pack-levels{ font-size: .76rem; color: #aaa; margin-top: 2px; font-weight: 700; }
+    .pack-block { display: flex; flex-direction: column; gap: 8px; }
+    .pack-expand-hint { font-size: .72rem; color: #aaa; margin-top: 2px; font-weight: 700; }
+    .level-chip-grid {
+      display: none;
+      grid-template-columns: repeat(auto-fill, minmax(108px, 1fr));
+      gap: 7px;
+      padding: 4px 4px 2px;
+    }
+    .level-chip-grid.open { display: grid; animation: fadeInOverlay .2s ease; }
+    .level-chip {
+      padding: 8px 6px; border-radius: 12px; border: 2px solid #E0E0F0;
+      background: #fff; cursor: pointer; font-family: var(--font-en);
+      font-size: .78rem; font-weight: 800; color: #4a2c00;
+      text-align: center; line-height: 1.25;
+      transition: border-color .12s, background .12s, transform .1s;
+      box-shadow: 0 1px 4px rgba(0,0,0,.07);
+    }
+    .level-chip:hover { border-color: var(--sw-blue); background: #eaf8fd; transform: scale(1.04); }
+    .level-chip.active-level { border-color: var(--correct); background: #e8fff0; }
+    .level-chip .chip-stars { display: block; font-size: .85rem; letter-spacing: 1px; margin-bottom: 2px; }
+    .level-chip .chip-name  { display: block; font-size: .72rem; color: #666; font-weight: 700; }
     .selector-close {
       margin-top: 18px; width: 100%; padding: 13px; border: none;
       border-radius: 50px; background: var(--sw-red); color: #fff;
@@ -539,7 +563,7 @@
 <div class="top-bar">
   <div class="top-row1">
     <header><h1 id="app-title">🖌️ 汉字连线练习</h1></header>
-    <div class="level-badge lv1" id="level-badge">⭐ Level 1</div>
+    <div class="level-badge lv1" id="level-badge" onclick="openSelector()" title="Choose a level" style="cursor:pointer;">⭐ Level 1</div>
     <div class="scoreboard">
       <span>      <span id="score-coin-icon">⭐</span> <span id="score-correct">0</span> / <span id="score-total">8</span></span>
       <span>❌ <span id="score-wrong">0</span></span>
@@ -1004,6 +1028,52 @@ const PACK_MEASURE = {
         { left: card(null, '道'), right: card(null, '线条')  },
         { left: card(null, '根'), right: card(null, '草')    },
         { left: card(null, '顶'), right: card('wén zhàng', '蚊帐') },
+      ]
+    },
+    {
+      // L12 — intro: each noun has exactly ONE valid measure word among the level's measure words
+      // (avoids 把花/枝花, 粒土豆/袋土豆, 口水/桶水 type confusion)
+      id: 12, cls: 'lv12',
+      label:      '⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐ Level 12 — Measure Words 量词（十二）',
+      shortLabel: '⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐ Level 12',
+      pairs: [
+        { left: card('zhī',   '枝'), right: card('là zhú',     '蜡烛') },
+        { left: card('lì',    '粒'), right: card('zuàn shí',   '钻石') },
+        { left: card('kǒu',   '口'), right: card('jǐng',       '井')   },
+        { left: card('jù',    '句'), right: card('shī',        '诗')   },
+        { left: card('bǎ',    '把'), right: card(null,         '伞')   },
+        { left: card('zhāng', '张'), right: card(null,         '床')   },
+        { left: card('tǒng',  '桶'), right: card(null,         '油')   },
+      ]
+    },
+    {
+      // L13 — extend: 把 is present, so 笔 (枝/把) is replaced with 蜡烛-variant nouns to keep unique
+      id: 13, cls: 'lv13',
+      label:      '⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐ Level 13 — Measure Words 量词（十三）',
+      shortLabel: '⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐ Level 13',
+      pairs: [
+        { left: card('lì',    '粒'), right: card('zhǒng zi',   '种子') },
+        { left: card('kǒu',   '口'), right: card('chí táng',   '池塘') },
+        { left: card('jù',    '句'), right: card(null,         '话')   },
+        { left: card('bǎ',    '把'), right: card('yào shi',    '钥匙') },
+        { left: card('zhāng', '张'), right: card(null,         '桌子') },
+        { left: card('biàn',  '遍'), right: card('kè wén',     '课文') },
+      ]
+    },
+    {
+      // L14 — more: 袋, 里 introduced; no 把 / no 桶 / no 粒 here to prevent
+      // 粒盐/把盐/袋盐, 把花/枝花, 口水/桶水 confusions
+      id: 14, cls: 'lv14',
+      label:      '⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐ Level 14 — Measure Words 量词（十四）',
+      shortLabel: '⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐ Level 14',
+      pairs: [
+        { left: card('zhī',   '枝'), right: card(null,         '花')   },
+        { left: card('kǒu',   '口'), right: card('guō',        '锅')   },
+        { left: card('jù',    '句'), right: card('jù zi',      '句子') },
+        { left: card('zhāng', '张'), right: card('dì tú',      '地图') },
+        { left: card(null,    '袋'), right: card('shuǐ guǒ',   '水果') },
+        { left: card('lǐ',    '里'), right: card(null,         '路')   },
+        { left: card('biàn',  '遍'), right: card('diàn yǐng',  '电影') },
       ]
     },
   ]
@@ -1936,8 +2006,12 @@ function openSelector() {
   const list = document.getElementById('pack-list');
   list.innerHTML = '';
   GAME_PACKS.forEach((pack, idx) => {
+    const isActive = (idx === currentPackIdx);
+    const block = document.createElement('div');
+    block.className = 'pack-block';
+
     const item = document.createElement('div');
-    item.className = 'pack-item' + (idx === currentPackIdx ? ' active-pack' : '');
+    item.className = 'pack-item' + (isActive ? ' active-pack' : '');
     item.innerHTML = `
       <div class="pack-icon">${pack.icon}</div>
       <div class="pack-info">
@@ -1945,9 +2019,38 @@ function openSelector() {
         <div class="pack-desc">${pack.desc}</div>
         <div class="pack-levels">${pack.levels.length} level${pack.levels.length > 1 ? 's' : ''} &nbsp;·&nbsp;
           ${pack.levels.reduce((s, l) => s + l.pairs.length, 0)} pairs total</div>
+        <div class="pack-expand-hint">Tap to choose a level ▾</div>
       </div>`;
-    item.addEventListener('click', () => loadPack(idx));
-    list.appendChild(item);
+
+    const grid = document.createElement('div');
+    grid.className = 'level-chip-grid' + (isActive ? ' open' : '');
+    pack.levels.forEach((lvl, lvlIdx) => {
+      const chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'level-chip'
+        + (isActive && lvlIdx === currentLevel ? ' active-level' : '');
+      const stars = (lvl.shortLabel.match(/⭐/g) || []).length;
+      const starStr = '⭐'.repeat(Math.min(stars, 5)) + (stars > 5 ? `×${stars}` : '');
+      chip.innerHTML = `
+        <span class="chip-stars">${starStr || '⭐'}</span>
+        <span class="chip-name">Level ${lvl.id} · ${lvl.pairs.length} pairs</span>`;
+      chip.addEventListener('click', (e) => {
+        e.stopPropagation();
+        loadPack(idx, lvlIdx);
+      });
+      grid.appendChild(chip);
+    });
+
+    item.addEventListener('click', () => {
+      // Toggle this pack's level grid; close others
+      const wasOpen = grid.classList.contains('open');
+      document.querySelectorAll('.level-chip-grid').forEach(g => g.classList.remove('open'));
+      if (!wasOpen) grid.classList.add('open');
+    });
+
+    block.appendChild(item);
+    block.appendChild(grid);
+    list.appendChild(block);
   });
   document.getElementById('selector-overlay').classList.add('show');
 }
@@ -1956,9 +2059,10 @@ function closeSelector() {
   document.getElementById('selector-overlay').classList.remove('show');
 }
 
-function loadPack(idx) {
+function loadPack(idx, levelIdx = 0) {
   currentPackIdx = idx;
-  currentLevel   = 0;
+  const pack = GAME_PACKS[idx];
+  currentLevel   = Math.max(0, Math.min(levelIdx, pack.levels.length - 1));
   closeSelector();
   buildRound();
 }
