@@ -15,11 +15,17 @@ function renderRadical() {
   document.getElementById('radical-progress').textContent =
     `${radicalIdx + 1} / ${radicalItems.length}`;
 
+  // Reset name reveal to hidden for each new radical (student names it first)
+  const nameGroup = document.getElementById('radical-name-group');
+  if (nameGroup) nameGroup.classList.add('hidden');
+  const nameBtn = document.getElementById('reveal-name-btn');
+  if (nameBtn) nameBtn.innerHTML = '🏷️ Name';
+
   const examplesEl = document.getElementById('radical-examples');
   // Reset to hidden state for each new radical
   examplesEl.classList.add('hidden');
   const btn = document.getElementById('reveal-examples-btn');
-  if (btn) btn.innerHTML = '👀 Show';
+  if (btn) btn.innerHTML = '👀 Examples';
   // Rebuild contents: placeholder + chips
   examplesEl.innerHTML = '';
   const placeholder = document.createElement('div');
@@ -117,7 +123,16 @@ function toggleRadicalExamples() {
   const btn = document.getElementById('reveal-examples-btn');
   const wasHidden = el.classList.contains('hidden');
   el.classList.toggle('hidden');
-  if (btn) btn.innerHTML = wasHidden ? '🙈 Hide' : '👀 Show';
+  if (btn) btn.innerHTML = wasHidden ? '🙈 Examples' : '👀 Examples';
+}
+
+function toggleRadicalName() {
+  const el  = document.getElementById('radical-name-group');
+  const btn = document.getElementById('reveal-name-btn');
+  if (!el) return;
+  const wasHidden = el.classList.contains('hidden');
+  el.classList.toggle('hidden');
+  if (btn) btn.innerHTML = wasHidden ? '🙈 Name' : '🏷️ Name';
 }
 
 // Chain animateStroke() one stroke at a time so we can play a sound per stroke.

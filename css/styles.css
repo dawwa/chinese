@@ -58,6 +58,7 @@ body::after  { bottom: 0; border-radius: 6px 6px 0 0; }
   backdrop-filter: blur(2px);
   margin-top: 4px;
   box-shadow: 0 2px 12px rgba(0,0,0,.10);
+  position: relative; z-index: 100;
 }
 .top-row1 { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; }
 .top-row2 { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; }
@@ -112,6 +113,35 @@ header h1 {
   cursor: pointer; user-select: none;
   white-space: nowrap;
 }
+
+/* ── Hamburger menu (mobile) ── */
+.menu-only-mobile { display: none; }
+.menu-wrap { position: relative; }
+.menu-btn { font-size: 1.1rem; padding: 5px 11px; }
+.menu-dropdown {
+  position: absolute; top: calc(100% + 6px); right: 0;
+  min-width: 200px;
+  background: #fff;
+  border: 2px solid var(--sw-blue);
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.25);
+  padding: 6px;
+  display: none; flex-direction: column; gap: 4px;
+  z-index: 1000;
+}
+.menu-dropdown.open { display: flex; }
+.menu-item {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px;
+  padding: 10px 14px; border-radius: 10px;
+  font-family: 'Nunito','Segoe UI',sans-serif;
+  font-size: .95rem; font-weight: 800; color: #2a2a3a;
+  background: #f5f5f7; border: none;
+  cursor: pointer; user-select: none;
+  text-align: left; width: 100%;
+}
+.menu-item:hover, .menu-item:active { background: #e8e8ee; }
+.menu-toggle { cursor: pointer; }
 /* ── Digital clock timer ── */
 .clock-display {
   font-family: 'Courier New', 'Lucida Console', monospace;
@@ -324,6 +354,23 @@ header h1 {
 }
 .radical-writer::before { left: 50%; top: 6%; bottom: 6%; width: 1px; }
 .radical-writer::after  { top: 50%; left: 6%; right: 6%; height: 1px; }
+.radical-name-group {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  min-height: 70px; justify-content: center;
+}
+.radical-name-group.hidden .radical-pinyin,
+.radical-name-group.hidden .radical-name-cn { display: none; }
+.radical-name-placeholder {
+  display: none;
+  font-family: var(--font-zh);
+  font-size: 1rem; font-weight: 700; color: #a87245;
+  background: repeating-linear-gradient(45deg, #fff7e6, #fff7e6 6px, #ffe7cf 6px, #ffe7cf 12px);
+  padding: 10px 22px; border-radius: 14px;
+  border: 2px dashed var(--sw-blue);
+  letter-spacing: .08em;
+  cursor: pointer;
+}
+.radical-name-group.hidden .radical-name-placeholder { display: block; }
 .radical-pinyin {
   font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
   font-size: clamp(.95rem, 2.4vh, 1.3rem);
@@ -595,7 +642,7 @@ header h1 {
 }
 
 /* ── Responsive ── */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   body::before, body::after { height: 6px; }
   body         { padding: 4px 6px 3px; gap: 3px; }
   .top-bar     { gap: 3px; padding: 4px 8px; border-radius: 14px; margin-top: 3px; }
@@ -613,6 +660,9 @@ header h1 {
   .btn         { padding: 5px 10px; font-size: .78rem; }
   .btn-label   { font-size: 0; }
   .btn-label::before { content: attr(data-short); font-size: 1.1rem; line-height: 1; }
+  /* Mobile: collapse Help + toggles into hamburger menu */
+  .menu-only-desktop { display: none !important; }
+  .menu-only-mobile  { display: inline-flex; }
   .level-badge { font-size: .68rem; padding: 3px 8px; }
   .scoreboard  { font-size: .75rem; padding: 3px 8px; gap: 5px; }
   /* hide long round-info text on phone */

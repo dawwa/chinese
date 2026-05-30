@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Noto+Serif+SC:wght@700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="css/styles.css?v=3" />
   <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 </head>
 <body>
@@ -35,13 +35,27 @@
       <button class="btn btn-switch"   onclick="openSelector()"><span class="btn-label" data-full="🎮 Switch Game" data-short="🎮 Game">🎮 Switch Game</span></button>
       <button class="btn btn-primary"  onclick="retryLevel()"><span class="btn-label" data-full="🔁 Retry" data-short="🔁 Retry">🔁 Retry</span></button>
       <button class="btn btn-accent"   onclick="resetAll()"><span class="btn-label" data-full="🔄 Restart" data-short="🔄 Reset">🔄 Restart</span></button>
-      <button class="btn btn-neutral"  onclick="toggleHelp()"><span class="btn-label" data-full="💡 Help" data-short="💡 Help">💡 Help</span></button>
-      <label class="celeb-toggle-wrap" onclick="toggleCelebration()" title="Celebration effects on/off">
+      <button class="btn btn-neutral menu-only-desktop"  onclick="toggleHelp()"><span class="btn-label" data-full="💡 Help" data-short="💡 Help">💡 Help</span></button>
+      <label class="celeb-toggle-wrap menu-only-desktop" onclick="toggleCelebration()" title="Celebration effects on/off">
         🎉 <div class="toggle-track" id="celeb-track"><div class="toggle-thumb"></div></div>
       </label>
-      <label class="sound-toggle-wrap" onclick="toggleSound()" title="Sound effects on/off">
+      <label class="sound-toggle-wrap menu-only-desktop" onclick="toggleSound()" title="Sound effects on/off">
         🔊 <div class="toggle-track on" id="sound-track"><div class="toggle-thumb"></div></div>
       </label>
+      <div class="menu-wrap menu-only-mobile">
+        <button class="btn btn-neutral menu-btn" id="menu-btn" onclick="toggleMenu(event)" aria-label="More options" aria-expanded="false">☰</button>
+        <div class="menu-dropdown" id="menu-dropdown" role="menu">
+          <button class="menu-item" role="menuitem" onclick="closeMenu(); toggleHelp();">💡 Help</button>
+          <label class="menu-item menu-toggle" role="menuitem" onclick="toggleCelebration()">
+            <span>🎉 Celebration</span>
+            <div class="toggle-track" id="celeb-track-m"><div class="toggle-thumb"></div></div>
+          </label>
+          <label class="menu-item menu-toggle" role="menuitem" onclick="toggleSound()">
+            <span>🔊 Sound</span>
+            <div class="toggle-track on" id="sound-track-m"><div class="toggle-thumb"></div></div>
+          </label>
+        </div>
+      </div>
     </div>
     <div class="round-info" id="round-info">Loading…</div>
   </div>
@@ -58,8 +72,11 @@
     <div class="radical-progress" id="radical-progress">1 / 1</div>
     <div class="radical-card">
       <div class="radical-writer" id="radical-writer"></div>
-      <div class="radical-pinyin" id="radical-pinyin"></div>
-      <div class="radical-name-cn" id="radical-name-cn"></div>
+      <div class="radical-name-group hidden" id="radical-name-group">
+        <div class="radical-name-placeholder" onclick="toggleRadicalName()">··· 这是什么部首？ What's this radical? ···</div>
+        <div class="radical-pinyin" id="radical-pinyin"></div>
+        <div class="radical-name-cn" id="radical-name-cn"></div>
+      </div>
       <div class="radical-examples-label">例字 Examples</div>
       <div class="radical-examples hidden" id="radical-examples">
         <div class="radical-examples-placeholder" onclick="toggleRadicalExamples()">··· 点击查看 Tap to reveal ···</div>
@@ -68,7 +85,8 @@
     <div class="radical-controls">
       <button class="btn btn-neutral" onclick="radicalPrev()">◀ Prev</button>
       <button class="btn btn-accent"  onclick="radicalReplay()">🔁 Replay</button>
-      <button class="btn btn-switch"  id="reveal-examples-btn" onclick="toggleRadicalExamples()">👀 Show</button>
+      <button class="btn btn-switch"  id="reveal-name-btn"     onclick="toggleRadicalName()">🏷️ Name</button>
+      <button class="btn btn-switch"  id="reveal-examples-btn" onclick="toggleRadicalExamples()">👀 Examples</button>
       <button class="btn btn-primary" onclick="radicalNext()">Next ▶</button>
     </div>
   </div>
@@ -117,12 +135,12 @@
 </div>
 
 <!-- App scripts (load order matters: utils → packs → audio → matching → radicals → selector → main) -->
-<script src="js/utils.js"></script>
-<script src="js/packs.js"></script>
-<script src="js/audio.js"></script>
-<script src="js/matching.js"></script>
-<script src="js/radicals.js"></script>
-<script src="js/selector.js"></script>
-<script src="js/main.js"></script>
+<script src="js/utils.js?v=2"></script>
+<script src="js/packs.js?v=2"></script>
+<script src="js/audio.js?v=2"></script>
+<script src="js/matching.js?v=2"></script>
+<script src="js/radicals.js?v=2"></script>
+<script src="js/selector.js?v=2"></script>
+<script src="js/main.js?v=2"></script>
 </body>
 </html>

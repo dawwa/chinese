@@ -74,6 +74,35 @@ function loadPack(idx, levelIdx = 0) {
 function toggleCelebration() {
   celebrationOn = !celebrationOn;
   document.getElementById('celeb-track').classList.toggle('on', celebrationOn);
+  const m = document.getElementById('celeb-track-m');
+  if (m) m.classList.toggle('on', celebrationOn);
+}
+
+/* ── Hamburger dropdown (mobile) ── */
+function toggleMenu(e) {
+  if (e) e.stopPropagation();
+  const dd = document.getElementById('menu-dropdown');
+  const btn = document.getElementById('menu-btn');
+  if (!dd) return;
+  const willOpen = !dd.classList.contains('open');
+  dd.classList.toggle('open', willOpen);
+  if (btn) btn.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+  if (willOpen) {
+    setTimeout(() => {
+      document.addEventListener('pointerdown', _menuOutsideClose, { once: true, capture: true });
+    }, 0);
+  }
+}
+function closeMenu() {
+  const dd = document.getElementById('menu-dropdown');
+  const btn = document.getElementById('menu-btn');
+  if (dd) dd.classList.remove('open');
+  if (btn) btn.setAttribute('aria-expanded', 'false');
+}
+function _menuOutsideClose(e) {
+  const wrap = e.target.closest && e.target.closest('.menu-wrap');
+  if (!wrap) closeMenu();
+  else document.addEventListener('pointerdown', _menuOutsideClose, { once: true, capture: true });
 }
 
 function toggleHelp() {

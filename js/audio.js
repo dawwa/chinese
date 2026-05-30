@@ -139,8 +139,11 @@ function playComplete() {
 }
 
 function toggleSound() {
+  // mirror state to mobile menu track if present
+  const m = document.getElementById('sound-track-m');
   soundOn = !soundOn;
   document.getElementById('sound-track').classList.toggle('on', soundOn);
+  if (m) m.classList.toggle('on', soundOn);
   // Unlock AudioContext on first interaction (required by iOS/Chrome policy)
   if (soundOn) _getCtx();
 }
