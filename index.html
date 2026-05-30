@@ -12,6 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Noto+Serif+SC:wght@700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -307,6 +308,88 @@
     .level-badge.lv13 { background: #C0392B; color: #fff; }
     .level-badge.lv14 { background: #2980B9; color: #fff; }
 
+    /* ── Radical display stage (display-mode pack) ── */
+    .radical-stage {
+      width: 100%; height: 100%;
+      display: none; flex-direction: column; align-items: center; justify-content: center;
+      gap: 10px; padding: 8px; position: relative; z-index: 2;
+    }
+    .radical-stage.show { display: flex; }
+    .radical-card {
+      background: var(--card-bg);
+      border-radius: 24px;
+      padding: 12px 18px;
+      box-shadow: var(--shadow);
+      border: 4px solid var(--sw-orange);
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      max-width: 95%;
+    }
+    .radical-writer {
+      width: clamp(140px, 26vh, 220px);
+      height: clamp(140px, 26vh, 220px);
+      background: #FFFAF3;
+      border-radius: 16px;
+      border: 2px dashed #f4845f;
+      position: relative;
+      overflow: hidden;
+    }
+    .radical-writer > svg { position: relative; z-index: 2; }
+    /* faint cross grid behind hanzi writer svg */
+    .radical-writer::before, .radical-writer::after {
+      content: ''; position: absolute; background: #f4845f33; pointer-events: none; z-index: 1;
+    }
+    .radical-writer::before { left: 50%; top: 6%; bottom: 6%; width: 1px; }
+    .radical-writer::after  { top: 50%; left: 6%; right: 6%; height: 1px; }
+    .radical-pinyin {
+      font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+      font-size: clamp(.95rem, 2.4vh, 1.3rem);
+      color: #888; font-weight: 600; letter-spacing: .06em;
+    }
+    .radical-name-cn {
+      font-family: var(--font-zh);
+      font-size: clamp(1.1rem, 2.8vh, 1.6rem);
+      color: #4a2c00; font-weight: 800; letter-spacing: .05em;
+    }
+    .radical-examples {
+      display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+      margin-top: 4px; min-height: 50px; align-items: center;
+    }
+    .radical-examples.hidden .radical-example { display: none; }
+    .radical-examples-placeholder {
+      display: none;
+      font-family: var(--font-zh);
+      font-size: 1rem; font-weight: 700; color: #a87245;
+      background: repeating-linear-gradient(45deg, #fff7e6, #fff7e6 6px, #ffe7cf 6px, #ffe7cf 12px);
+      padding: 10px 22px; border-radius: 14px;
+      border: 2px dashed var(--sw-blue);
+      letter-spacing: .12em;
+      cursor: pointer;
+    }
+    .radical-examples.hidden .radical-examples-placeholder { display: block; }
+    .radical-example {
+      font-family: var(--font-zh);
+      font-size: clamp(1.3rem, 3.2vh, 2rem);
+      font-weight: 700; color: #2c1000;
+      background: linear-gradient(135deg, #fff7e6, #ffe7cf);
+      padding: 4px 14px; border-radius: 14px;
+      border: 2px solid var(--sw-blue);
+      box-shadow: 0 2px 6px rgba(0,0,0,.08);
+    }
+    .radical-examples-label {
+      font-size: .82rem; color: #7a4500; font-weight: 800;
+      margin-top: 4px;
+    }
+    .radical-controls {
+      display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;
+      margin-top: 4px;
+    }
+    .radical-progress {
+      font-size: .85rem; color: #7a4500; font-weight: 800;
+      background: rgba(255,255,255,.7);
+      padding: 4px 14px; border-radius: 50px;
+      border: 2px solid rgba(255,255,255,.85);
+    }
+
     /* ── Feedback popup ── */
     .feedback {
       position: fixed; top: 50%; left: 50%;
@@ -596,6 +679,24 @@
   <div class="columns" id="columns">
     <div class="col" id="col-left"></div>
     <div class="col" id="col-right"></div>
+  </div>
+  <div class="radical-stage" id="radical-stage">
+    <div class="radical-progress" id="radical-progress">1 / 1</div>
+    <div class="radical-card">
+      <div class="radical-writer" id="radical-writer"></div>
+      <div class="radical-pinyin" id="radical-pinyin"></div>
+      <div class="radical-name-cn" id="radical-name-cn"></div>
+      <div class="radical-examples-label">例字 Examples</div>
+      <div class="radical-examples hidden" id="radical-examples">
+        <div class="radical-examples-placeholder" onclick="toggleRadicalExamples()">··· 点击查看 Tap to reveal ···</div>
+      </div>
+    </div>
+    <div class="radical-controls">
+      <button class="btn btn-neutral" onclick="radicalPrev()">◀ Prev</button>
+      <button class="btn btn-accent"  onclick="radicalReplay()">🔁 Replay</button>
+      <button class="btn btn-switch"  id="reveal-examples-btn" onclick="toggleRadicalExamples()">👀 Show</button>
+      <button class="btn btn-primary" onclick="radicalNext()">Next ▶</button>
+    </div>
   </div>
 </div>
 
@@ -1224,8 +1325,122 @@ const PACK_STRUCTURE = {
   ]
 };
 
+/* ═══════════════════════════════════════════════════════════════
+   PACK 5 — Radicals 偏旁部首 (display-only, parent-led)
+   POC with 2 radicals: 扌 (提手旁) and 口 (口字旁)
+═══════════════════════════════════════════════════════════════ */
+const PACK_RADICALS = {
+  id: 'radicals',
+  icon: '🖋️',
+  name: 'Radicals',
+  nameCN: '偏旁部首',
+  desc: 'Watch a radical animate, name it, then think of an example character',
+  type: 'display',
+  attribution: `Stroke animation powered by <a href="https://hanziwriter.org/" target="_blank" rel="noopener">Hanzi Writer</a>
+    (data from <a href="https://github.com/skishore/makemeahanzi" target="_blank" rel="noopener">Make Me a Hanzi</a>),
+    used under the <a href="https://github.com/chanind/hanzi-writer/blob/master/LICENSE" target="_blank" rel="noopener">ARPHIC license</a>.`,
+  levels: [
+    {
+      id: 1, cls: 'lv1',
+      label:      '⭐ Level 1 — 偏旁部首（一）',
+      shortLabel: '⭐ Level 1',
+      items: [
+        { char: '口', pinyin: 'kǒu zì páng',  nameCN: '口字旁',  examples: ['吃','叫','吗','听'] },
+        { char: '扌', pinyin: 'tí shǒu páng', nameCN: '提手旁',  examples: ['打','拍','抱','扔'] },
+        { char: '木', pinyin: 'mù zì páng',   nameCN: '木字旁',  examples: ['树','林','桥','板'] },
+        { char: '日', pinyin: 'rì zì páng',   nameCN: '日字旁',  examples: ['时','明','晴','暗'] },
+        { char: '石', pinyin: 'shí zì páng',  nameCN: '石字旁',  examples: ['破','硬','码','碗'] },
+      ],
+    },
+    {
+      id: 2, cls: 'lv2',
+      label:      '⭐⭐ Level 2 — 偏旁部首（二）',
+      shortLabel: '⭐⭐ Level 2',
+      items: [
+        { char: '女', pinyin: 'nǚ zì páng',    nameCN: '女字旁',  examples: ['妈','姐','妹','好'] },
+        { char: '氵', pinyin: 'sān diǎn shuǐ', nameCN: '三点水',  examples: ['江','河','海','流'] },
+        { char: '月', pinyin: 'ròu yuè páng',  nameCN: '肉月旁',  examples: ['肚','脸','脚','胖'] },
+        { char: '亻', pinyin: 'dān rén páng',  nameCN: '单人旁',  examples: ['你','他','们','住'] },
+        { char: '穴', pinyin: 'xué bǎo gài',   nameCN: '穴宝盖',  examples: ['空','穿','突','窗'] },
+      ],
+    },
+    {
+      id: 3, cls: 'lv3',
+      label:      '⭐⭐⭐ Level 3 — 偏旁部首（三）',
+      shortLabel: '⭐⭐⭐ Level 3',
+      items: [
+        { char: '犭', pinyin: 'fǎn quǎn páng', nameCN: '反犬旁',  examples: ['狗','猫','狮','猪'] },
+        { char: '艹', pinyin: 'cǎo zì tóu',    nameCN: '草字头',  examples: ['花','草','苹','茶'] },
+        { char: '讠', pinyin: 'yán zì páng',   nameCN: '言字旁',  examples: ['说','话','请','谢'] },
+        { char: '人', pinyin: 'rén zì tóu',    nameCN: '人字旁/头', examples: ['从','众','个','今'] },
+        { char: '辶', pinyin: 'zǒu zhī dǐ',    nameCN: '走之底',  examples: ['进','远','还','这'] },
+      ],
+    },
+    {
+      id: 4, cls: 'lv4',
+      label:      '⭐⭐⭐⭐ Level 4 — 偏旁部首（四）',
+      shortLabel: '⭐⭐⭐⭐ Level 4',
+      items: [
+        { char: '纟', pinyin: 'jiǎo sī páng',  nameCN: '绞丝旁',  examples: ['红','绿','线','细'] },
+        { char: '竹', pinyin: 'zhú zì tóu',    nameCN: '竹字头',  examples: ['笑','笔','答','算'] },
+        { char: '土', pinyin: 'tí tǔ páng',    nameCN: '提土旁',  examples: ['地','块','城','场'] },
+        { char: '王', pinyin: 'wáng zì páng',  nameCN: '王字旁/底', examples: ['玩','球','现','理'] },
+        { char: '心', pinyin: 'xīn zì dǐ',     nameCN: '心字底',  examples: ['想','念','思','怎'] },
+      ],
+    },
+    {
+      id: 5, cls: 'lv5',
+      label:      '⭐⭐⭐⭐⭐ Level 5 — 偏旁部首（五）',
+      shortLabel: '⭐⭐⭐⭐⭐ Level 5',
+      items: [
+        { char: '宀', pinyin: 'bǎo gài tóu',   nameCN: '宝盖头',  examples: ['家','安','字','完'] },
+        { char: '灬', pinyin: 'sì diǎn dǐ',    nameCN: '四点底',  examples: ['热','点','然','照'] },
+        { char: '又', pinyin: 'yòu zì páng',   nameCN: '又字旁',  examples: ['友','双','对','取'] },
+        { char: '目', pinyin: 'mù zì páng',    nameCN: '目字旁',  examples: ['看','眼','睛','睡'] },
+        { char: '刂', pinyin: 'lì dāo páng',   nameCN: '立刀旁',  examples: ['别','到','刚','利'] },
+      ],
+    },
+    {
+      id: 6, cls: 'lv6',
+      label:      '⭐⭐⭐⭐⭐⭐ Level 6 — 偏旁部首（六）',
+      shortLabel: '⭐⭐⭐⭐⭐⭐ Level 6',
+      items: [
+        { char: '匚', pinyin: 'sān kuàng',     nameCN: '半边框/三框', examples: ['区','医','匹','匠'] },
+        { char: '疒', pinyin: 'bìng zì páng',  nameCN: '病字旁',  examples: ['病','痛','疼','疯'] },
+        { char: '钅', pinyin: 'jīn zì páng',   nameCN: '金字旁',  examples: ['银','钟','钱','错'] },
+        { char: '忄', pinyin: 'shù xīn páng',  nameCN: '竖心旁',  examples: ['怕','快','忙','慢'] },
+        { char: '走', pinyin: 'zǒu zì páng',   nameCN: '走字旁',  examples: ['起','越','赶','超'] },
+      ],
+    },
+    {
+      id: 7, cls: 'lv7',
+      label:      '⭐⭐⭐⭐⭐⭐⭐ Level 7 — 偏旁部首（七）',
+      shortLabel: '⭐⭐⭐⭐⭐⭐⭐ Level 7',
+      items: [
+        { char: '火', pinyin: 'huǒ zì páng',   nameCN: '火字旁',  examples: ['灯','烧','炸','烟'] },
+        { char: '囗', pinyin: 'dà kǒu kuàng',  nameCN: '大口框',  examples: ['国','圆','园','围'] },
+        { char: '彳', pinyin: 'shuāng rén páng', nameCN: '双人旁', examples: ['行','很','待','往'] },
+        { char: '虫', pinyin: 'chóng zì páng', nameCN: '虫字旁',  examples: ['蚂','蚊','蛇','虾'] },
+        { char: '冖', pinyin: 'tū bǎo gài',    nameCN: '秃宝盖',  examples: ['写','军','农','冠'] },
+      ],
+    },
+    {
+      id: 8, cls: 'lv8',
+      label:      '⭐⭐⭐⭐⭐⭐⭐⭐ Level 8 — 偏旁部首（八）',
+      shortLabel: '⭐⭐⭐⭐⭐⭐⭐⭐ Level 8',
+      items: [
+        { char: '衣', pinyin: 'yī zì dǐ',      nameCN: '衣字底',  examples: ['装','袋','裹','裂'] },
+        { char: '子', pinyin: 'zǐ zì páng',    nameCN: '子字旁',  examples: ['孩','孙','学','孔'] },
+        { char: '身', pinyin: 'shēn zì páng',  nameCN: '身字旁',  examples: ['躲','躺','射','躬'] },
+        { char: '足', pinyin: 'zú zì páng',    nameCN: '足字旁',  examples: ['跑','跳','路','踢'] },
+        { char: '羊', pinyin: 'yáng zì tóu',   nameCN: '羊字旁/头', examples: ['美','群','着','差'] },
+      ],
+    },
+  ],
+};
+
 /* ── Master pack registry ── */
-const GAME_PACKS = [PACK_STROKES, PACK_ANTONYMS, PACK_MEASURE, PACK_STRUCTURE];
+const GAME_PACKS = [PACK_STROKES, PACK_ANTONYMS, PACK_MEASURE, PACK_STRUCTURE, PACK_RADICALS];
 
 /* ═══════════════════════════════════════════════════════════════
    STATE
@@ -1247,6 +1462,13 @@ let levelStartTime  = 0;
 let levelCoins      = 0;
 let celebrationOn   = false;  // toggle: fire particles on correct match
 let soundOn         = true;   // toggle: sound effects
+
+// Display-mode state (radicals pack)
+let radicalItems    = [];
+let radicalIdx      = 0;
+let radicalWriter   = null;
+let radicalStrokeCount = 0;
+let radicalLoopActive  = false;
 const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent) ||
               (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
@@ -1317,6 +1539,59 @@ function playWrong() {
     osc.start(t + start);
     osc.stop(t + start + 0.25);
   });
+}
+
+// ✏️ Pencil-on-paper stroke — quiet scratchy graphite (narrowband filtered noise,
+// short bursts to evoke pencil grain rather than airy whoosh)
+function playStrokeBrush(strokeNum = 0) {
+  if (!soundOn) return;
+  const ctx    = _getCtx();
+  const master = ctx.createGain();
+  master.gain.setValueAtTime(0.05, ctx.currentTime);   // much quieter overall
+  master.connect(ctx.destination);
+  const t = ctx.currentTime;
+
+  // Shorter buffer — pencil scratches are crisp, not breathy
+  const dur = 0.32;
+  const sr  = ctx.sampleRate;
+  const len = Math.floor(sr * dur);
+  const buf = ctx.createBuffer(1, len, sr);
+  const data = buf.getChannelData(0);
+
+  // Sparse "grain" noise: only a fraction of samples are non-zero, giving a
+  // brittle scratchy texture instead of a smooth airflow.
+  const fadeIn  = Math.floor(sr * 0.012);
+  const fadeOut = Math.floor(sr * 0.080);
+  for (let i = 0; i < len; i++) {
+    let env = 1;
+    if (i < fadeIn)             env = i / fadeIn;
+    else if (i > len - fadeOut) env = (len - i) / fadeOut;
+    // Only ~35% of samples carry signal → granular, drier texture
+    const sample = (Math.random() < 0.35) ? (Math.random() * 2 - 1) : 0;
+    data[i] = sample * env;
+  }
+
+  const src = ctx.createBufferSource();
+  src.buffer = buf;
+
+  // Narrowband bandpass high in the spectrum — graphite-on-paper "skritch" lives
+  // around 3–5 kHz. High Q removes the airy hiss that comes from broadband noise.
+  const bp = ctx.createBiquadFilter();
+  bp.type = 'bandpass';
+  bp.frequency.value = 3600 + (strokeNum % 5) * 220;
+  bp.Q.value = 4.5;
+
+  // High-shelf cut to roll off any remaining airy top end
+  const hs = ctx.createBiquadFilter();
+  hs.type = 'highshelf';
+  hs.frequency.value = 6000;
+  hs.gain.value = -12;
+
+  src.connect(bp);
+  bp.connect(hs);
+  hs.connect(master);
+  src.start(t);
+  src.stop(t + dur + 0.05);
 }
 
 // 🎉 Level complete — C major fanfare arpeggio then chord sustain
@@ -1502,6 +1777,31 @@ function buildCardInner(cardData) {
 function buildRound() {
   const pack  = GAME_PACKS[currentPackIdx];
   const level = pack.levels[currentLevel];
+
+  // Display-mode pack (e.g., radicals): swap UI and short-circuit matching logic
+  if (pack.type === 'display') {
+    document.getElementById('columns').style.display = 'none';
+    document.getElementById('line-canvas').style.display = 'none';
+    document.getElementById('radical-stage').classList.add('show');
+    document.getElementById('level-complete-bar').style.display = 'none';
+    radicalItems = level.items || [];
+    radicalIdx   = 0;
+    renderRadical();
+    updateLevelBadge();
+    updateAttribution();
+    // hide round-info, scoreboard, clock for clean parent-led view
+    const roundInfo = document.getElementById('round-info');
+    if (roundInfo) roundInfo.style.display = 'none';
+    return;
+  }
+
+  // Matching-mode (default): restore normal UI
+  document.getElementById('columns').style.display = '';
+  document.getElementById('line-canvas').style.display = '';
+  document.getElementById('radical-stage').classList.remove('show');
+  const roundInfo = document.getElementById('round-info');
+  if (roundInfo) roundInfo.style.display = '';
+
   currentPairs = level.pairs;
   leftOrder    = shuffle([...Array(currentPairs.length).keys()]);
   rightOrder   = shuffle([...Array(currentPairs.length).keys()]);
@@ -1889,9 +2189,13 @@ function updateScoreboard() {
   document.getElementById('score-wrong').textContent   = levelWrong;
 
   const pack        = GAME_PACKS[currentPackIdx];
-  const totalPairs  = pack.levels.reduce((s, l) => s + l.pairs.length, 0);
-  const doneBefore  = pack.levels.slice(0, currentLevel).reduce((s, l) => s + l.pairs.length, 0);
-  const pct         = Math.round((doneBefore + matched) / totalPairs * 100);
+  if (pack.type === 'display') {
+    document.getElementById('progress-bar').style.width = '0%';
+    return;
+  }
+  const totalPairs  = pack.levels.reduce((s, l) => s + (l.pairs ? l.pairs.length : 0), 0);
+  const doneBefore  = pack.levels.slice(0, currentLevel).reduce((s, l) => s + (l.pairs ? l.pairs.length : 0), 0);
+  const pct         = totalPairs ? Math.round((doneBefore + matched) / totalPairs * 100) : 0;
   document.getElementById('progress-bar').style.width = pct + '%';
 }
 
@@ -1961,6 +2265,166 @@ function showRoundComplete() {
 }
 
 /* ═══════════════════════════════════════════════════════════════
+   RADICAL DISPLAY MODE (parent-led)
+═══════════════════════════════════════════════════════════════ */
+function renderRadical() {
+  if (!radicalItems.length) return;
+  const item = radicalItems[radicalIdx];
+  const target = document.getElementById('radical-writer');
+  target.innerHTML = ''; // clear previous SVG
+  radicalWriter = null;
+  radicalLoopActive = false;
+  radicalStrokeCount = 0;
+
+  document.getElementById('radical-pinyin').textContent  = item.pinyin || '';
+  document.getElementById('radical-name-cn').textContent = item.nameCN || item.char;
+  document.getElementById('radical-progress').textContent =
+    `${radicalIdx + 1} / ${radicalItems.length}`;
+
+  const examplesEl = document.getElementById('radical-examples');
+  // Reset to hidden state for each new radical
+  examplesEl.classList.add('hidden');
+  const btn = document.getElementById('reveal-examples-btn');
+  if (btn) btn.innerHTML = '👀 Show';
+  // Rebuild contents: placeholder + chips
+  examplesEl.innerHTML = '';
+  const placeholder = document.createElement('div');
+  placeholder.className = 'radical-examples-placeholder';
+  placeholder.textContent = '··· 点击查看 Tap to reveal ···';
+  placeholder.onclick = toggleRadicalExamples;
+  examplesEl.appendChild(placeholder);
+  (item.examples || []).forEach(ch => {
+    const span = document.createElement('span');
+    span.className = 'radical-example';
+    span.textContent = ch;
+    examplesEl.appendChild(span);
+  });
+
+  if (typeof HanziWriter === 'undefined') {
+    console.warn('[radicals] HanziWriter not loaded — showing plain glyph');
+    target.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-family:var(--font-zh);font-size:5rem;color:#4a2c00;">${item.char}</div>`;
+    return;
+  }
+
+  console.log('[radicals] creating writer for', item.char, 'target=', target, 'visible=', target.offsetWidth + 'x' + target.offsetHeight);
+  try {
+    radicalWriter = HanziWriter.create(target, item.char, {
+      width: 200,
+      height: 200,
+      padding: 10,
+      strokeColor: '#1a1a1a',
+      radicalColor: '#1a1a1a',
+      outlineColor: '#e8c9a0',
+      delayBetweenStrokes: 350,
+      strokeAnimationSpeed: 1,
+      delayBetweenLoops: 1500,
+      showOutline: true,
+      showCharacter: false,
+      onLoadCharDataSuccess: (charData) => {
+        console.log('[radicals] ✅ loaded data for', item.char);
+        radicalStrokeCount = (charData && charData.strokes) ? charData.strokes.length : 0;
+        radicalLoopActive = true;
+        radicalAnimateLoop(item.char);
+      },
+      onLoadCharDataError: (reason) => {
+        const msg = reason && reason.message ? reason.message : String(reason);
+        console.warn('[radicals] ❌ no data for', item.char, reason);
+        target.innerHTML =
+          `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;font-family:var(--font-zh);gap:6px;">
+             <div style="font-size:4.5rem;color:#4a2c00;line-height:1;">${item.char}</div>
+             <div style="font-size:.7rem;color:#c0392b;font-family:'Segoe UI',sans-serif;text-align:center;padding:0 6px;">
+               ⚠ no stroke data<br/><span style="opacity:.7">${msg.slice(0,80)}</span>
+             </div>
+           </div>`;
+      },
+    });
+    console.log('[radicals] writer created:', radicalWriter);
+  } catch (e) {
+    console.error('[radicals] HanziWriter.create failed', e);
+    target.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-family:var(--font-zh);font-size:5rem;color:#4a2c00;">${item.char}</div>`;
+  }
+}
+
+function radicalNext() {
+  if (!radicalItems.length) return;
+  radicalLoopActive = false;
+  if (radicalIdx < radicalItems.length - 1) {
+    radicalIdx++;
+    renderRadical();
+  } else {
+    const pack = GAME_PACKS[currentPackIdx];
+    if (currentLevel < pack.levels.length - 1) {
+      currentLevel++;
+      buildRound();
+    } else {
+      radicalIdx = 0;
+      renderRadical();
+    }
+  }
+}
+
+function radicalPrev() {
+  if (!radicalItems.length) return;
+  radicalLoopActive = false;
+  if (radicalIdx > 0) {
+    radicalIdx--;
+    renderRadical();
+  }
+}
+
+function radicalReplay() {
+  if (!radicalWriter) return;
+  radicalLoopActive = true;
+  const item = radicalItems[radicalIdx];
+  // Hide any in-progress strokes, then re-run our chained animator
+  try { radicalWriter.hideCharacter({ duration: 0 }); } catch (e) {}
+  radicalAnimateLoop(item.char);
+}
+
+function toggleRadicalExamples() {
+  const el  = document.getElementById('radical-examples');
+  const btn = document.getElementById('reveal-examples-btn');
+  const wasHidden = el.classList.contains('hidden');
+  el.classList.toggle('hidden');
+  if (btn) btn.innerHTML = wasHidden ? '🙈 Hide' : '👀 Show';
+}
+
+// Chain animateStroke() one stroke at a time so we can play a sound per stroke.
+// Hanzi Writer's animateCharacter()/loopCharacterAnimation() don't expose
+// per-stroke callbacks, so we drive the animation manually.
+function radicalAnimateLoop(char) {
+  if (!radicalWriter || !radicalLoopActive || radicalStrokeCount <= 0) return;
+  const myWriter = radicalWriter;
+  const myChar   = char;
+
+  const animateOne = (i) => {
+    // Bail if the user navigated away or replayed
+    if (!radicalLoopActive || radicalWriter !== myWriter) return;
+    if (i >= radicalStrokeCount) {
+      // Finished one full pass — pause, hide, and restart the loop
+      setTimeout(() => {
+        if (!radicalLoopActive || radicalWriter !== myWriter) return;
+        try { myWriter.hideCharacter({ duration: 300 }); } catch (e) {}
+        setTimeout(() => {
+          if (!radicalLoopActive || radicalWriter !== myWriter) return;
+          radicalAnimateLoop(myChar);
+        }, 600);
+      }, 1200);
+      return;
+    }
+    playStrokeBrush(i);
+    try {
+      myWriter.animateStroke(i, {
+        onComplete: () => setTimeout(() => animateOne(i + 1), 220),
+      });
+    } catch (e) {
+      console.error('[radicals] animateStroke failed', e);
+    }
+  };
+  animateOne(0);
+}
+
+/* ═══════════════════════════════════════════════════════════════
    NAVIGATION
 ═══════════════════════════════════════════════════════════════ */
 function nextLevel() {
@@ -2018,7 +2482,7 @@ function openSelector() {
         <div class="pack-name">${pack.nameCN} &nbsp; ${pack.name}</div>
         <div class="pack-desc">${pack.desc}</div>
         <div class="pack-levels">${pack.levels.length} level${pack.levels.length > 1 ? 's' : ''} &nbsp;·&nbsp;
-          ${pack.levels.reduce((s, l) => s + l.pairs.length, 0)} pairs total</div>
+          ${pack.levels.reduce((s, l) => s + (l.pairs ? l.pairs.length : (l.items ? l.items.length : 0)), 0)} ${pack.type === 'display' ? 'items' : 'pairs'} total</div>
         <div class="pack-expand-hint">Tap to choose a level ▾</div>
       </div>`;
 
@@ -2031,9 +2495,11 @@ function openSelector() {
         + (isActive && lvlIdx === currentLevel ? ' active-level' : '');
       const stars = (lvl.shortLabel.match(/⭐/g) || []).length;
       const starStr = '⭐'.repeat(Math.min(stars, 5)) + (stars > 5 ? `×${stars}` : '');
+      const cnt = lvl.pairs ? lvl.pairs.length : (lvl.items ? lvl.items.length : 0);
+      const cntLabel = lvl.pairs ? 'pairs' : 'items';
       chip.innerHTML = `
         <span class="chip-stars">${starStr || '⭐'}</span>
-        <span class="chip-name">Level ${lvl.id} · ${lvl.pairs.length} pairs</span>`;
+        <span class="chip-name">Level ${lvl.id} · ${cnt} ${cntLabel}</span>`;
       chip.addEventListener('click', (e) => {
         e.stopPropagation();
         loadPack(idx, lvlIdx);
@@ -2060,6 +2526,9 @@ function closeSelector() {
 }
 
 function loadPack(idx, levelIdx = 0) {
+  // Stop any in-progress radical animation/sound from a previous pack
+  radicalLoopActive = false;
+  radicalWriter = null;
   currentPackIdx = idx;
   const pack = GAME_PACKS[idx];
   currentLevel   = Math.max(0, Math.min(levelIdx, pack.levels.length - 1));
