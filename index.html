@@ -1009,8 +1009,153 @@ const PACK_MEASURE = {
   ]
 };
 
+/* ═══════════════════════════════════════════════════════════════
+   PACK 4 — Character Structure 汉字结构
+═══════════════════════════════════════════════════════════════ */
+const PACK_STRUCTURE = {
+  id: 'structure',
+  icon: '🧩',
+  name: 'Character Structure',
+  nameCN: '汉字结构',
+  desc: 'Match each character to its structural type',
+  attribution: null,
+  levels: [
+    {
+      id: 1, cls: 'lv1',
+      label:      '⭐ Level 1 — 汉字结构（一）',
+      shortLabel: '⭐ Level 1',
+      pairs: [
+        { left: card(null,        '月'), right: card('dú tǐ zì',           '独体字')     },
+        { left: card(null,        '笑'), right: card('shàng xià',          '上下结构')   },
+        { left: card(null,        '高'), right: card('shàng zhōng xià',    '上中下结构') },
+        { left: card(null,        '记'), right: card('zuǒ yòu',            '左右结构')   },
+        { left: card(null,        '游'), right: card('zuǒ zhōng yòu',      '左中右结构') },
+        { left: card(null,        '国'), right: card('quán bāo wéi',       '全包围结构') },
+        { left: card(null,        '远'), right: card('bàn bāo wéi',        '半包围结构') },
+      ]
+    },
+    {
+      id: 2, cls: 'lv2',
+      label:      '⭐⭐ Level 2 — 汉字结构（二）',
+      shortLabel: '⭐⭐ Level 2',
+      pairs: [
+        { left: card(null,        '日'), right: card('dú tǐ zì',           '独体字')     },
+        { left: card(null,        '苹'), right: card('shàng xià',          '上下结构')   },
+        { left: card(null,        '亮'), right: card('shàng zhōng xià',    '上中下结构') },
+        { left: card('qīng',      '蜻'), right: card('zuǒ yòu',            '左右结构')   },
+        { left: card('bān',       '班'), right: card('zuǒ zhōng yòu',      '左中右结构') },
+        { left: card(null,        '回'), right: card('quán bāo wéi',       '全包围结构') },
+        { left: card(null,        '病'), right: card('bàn bāo wéi',        '半包围结构') },
+      ]
+    },
+    {
+      id: 3, cls: 'lv3',
+      label:      '⭐⭐⭐ Level 3 — 汉字结构（三）',
+      shortLabel: '⭐⭐⭐ Level 3',
+      pairs: [
+        { left: card(null,        '土'), right: card('dú tǐ zì',           '独体字')     },
+        { left: card(null,        '哭'), right: card('shàng xià',          '上下结构')   },
+        { left: card('bí',        '鼻'), right: card('shàng zhōng xià',    '上中下结构') },
+        { left: card('è',         '饿'), right: card('zuǒ yòu',            '左右结构')   },
+        { left: card('bāi',       '掰'), right: card('zuǒ zhōng yòu',      '左中右结构') },
+        { left: card(null,        '圈'), right: card('quán bāo wéi',       '全包围结构') },
+        { left: card('dài',       '戴'), right: card('bàn bāo wéi',        '半包围结构') },
+      ]
+    },
+    {
+      id: 4, cls: 'lv4',
+      label:      '⭐⭐⭐⭐ Level 4 — 汉字结构（四）',
+      shortLabel: '⭐⭐⭐⭐ Level 4',
+      pairs: [
+        { left: card(null,        '米'), right: card('dú tǐ zì',           '独体字')     },
+        { left: card(null,        '音'), right: card('shàng xià',          '上下结构')   },
+        { left: card(null,        '意'), right: card('shàng zhōng xià',    '上中下结构') },
+        { left: card(null,        '经'), right: card('zuǒ yòu',            '左右结构')   },
+        { left: card('bàn',       '瓣'), right: card('zuǒ zhōng yòu',      '左中右结构') },
+        { left: card(null,        '圆'), right: card('quán bāo wéi',       '全包围结构') },
+        { left: card(null,        '画'), right: card('bàn bāo wéi',        '半包围结构') },
+      ]
+    },
+    {
+      id: 5, cls: 'lv5',
+      label:      '⭐⭐⭐⭐⭐ Level 5 — 汉字结构（五）',
+      shortLabel: '⭐⭐⭐⭐⭐ Level 5',
+      pairs: [
+        { left: card(null,        '王'), right: card('dú tǐ zì',           '独体字')     },
+        { left: card('láo',       '牢'), right: card('shàng xià',          '上下结构')   },
+        { left: card('suàn',      '算'), right: card('shàng zhōng xià',    '上中下结构') },
+        { left: card('dié',       '蝶'), right: card('zuǒ yòu',            '左右结构')   },
+        { left: card(null,        '尾'), right: card('bàn bāo wéi',        '半包围结构') },
+      ]
+    },
+    {
+      id: 6, cls: 'lv6',
+      label:      '⭐⭐⭐⭐⭐⭐ Level 6 — 汉字结构（六）',
+      shortLabel: '⭐⭐⭐⭐⭐⭐ Level 6',
+      pairs: [
+        { left: card(null,        '已'), right: card('dú tǐ zì',           '独体字')     },
+        { left: card(null,        '等'), right: card('shàng xià',          '上下结构')   },
+        { left: card(null,        '爱'), right: card('shàng zhōng xià',    '上中下结构') },
+        { left: card('zāo',       '糟'), right: card('zuǒ yòu',            '左右结构')   },
+        { left: card('zhe',       '着'), right: card('bàn bāo wéi',        '半包围结构') },
+      ]
+    },
+    {
+      id: 7, cls: 'lv7',
+      label:      '⭐⭐⭐⭐⭐⭐⭐ Level 7 — 汉字结构（七）',
+      shortLabel: '⭐⭐⭐⭐⭐⭐⭐ Level 7',
+      pairs: [
+        { left: card(null,        '田'), right: card('dú tǐ zì',           '独体字')     },
+        { left: card('tū',        '突'), right: card('shàng xià',          '上下结构')   },
+        { left: card('hǎn',       '喊'), right: card('zuǒ yòu',            '左右结构')   },
+        { left: card('pǐ',        '匹'), right: card('bàn bāo wéi',        '半包围结构') },
+      ]
+    },
+    {
+      id: 8, cls: 'lv8',
+      label:      '⭐⭐⭐⭐⭐⭐⭐⭐ Level 8 — 汉字结构（八）',
+      shortLabel: '⭐⭐⭐⭐⭐⭐⭐⭐ Level 8',
+      pairs: [
+        { left: card(null,        '木'), right: card('dú tǐ zì',           '独体字')     },
+        { left: card('zěn',       '怎'), right: card('shàng xià',          '上下结构')   },
+        { left: card(null,        '伯'), right: card('zuǒ yòu',            '左右结构')   },
+        { left: card(null,        '向'), right: card('bàn bāo wéi',        '半包围结构') },
+      ]
+    },
+    {
+      id: 9, cls: 'lv9',
+      label:      '⭐⭐⭐⭐⭐⭐⭐⭐⭐ Level 9 — 汉字结构（九）',
+      shortLabel: '⭐⭐⭐⭐⭐⭐⭐⭐⭐ Level 9',
+      pairs: [
+        { left: card(null,        '虫'), right: card('dú tǐ zì',           '独体字')     },
+        { left: card('bèn',       '笨'), right: card('shàng xià',          '上下结构')   },
+        { left: card('tòng',      '痛'), right: card('bàn bāo wéi',        '半包围结构') },
+      ]
+    },
+    {
+      id: 10, cls: 'lv10',
+      label:      '⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐ Level 10 — 汉字结构（十）',
+      shortLabel: '⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐ Level 10',
+      pairs: [
+        { left: card(null,        '正'), right: card('dú tǐ zì',           '独体字')     },
+        { left: card('wàng',      '忘'), right: card('shàng xià',          '上下结构')   },
+        { left: card('fáng',      '房'), right: card('bàn bāo wéi',        '半包围结构') },
+      ]
+    },
+    {
+      id: 11, cls: 'lv11',
+      label:      '⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐ Level 11 — 汉字结构（十一）',
+      shortLabel: '⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐ Level 11',
+      pairs: [
+        { left: card('tóu',       '头'), right: card('dú tǐ zì',           '独体字')     },
+        { left: card('yuè',       '越'), right: card('bàn bāo wéi',        '半包围结构') },
+      ]
+    },
+  ]
+};
+
 /* ── Master pack registry ── */
-const GAME_PACKS = [PACK_STROKES, PACK_ANTONYMS, PACK_MEASURE];
+const GAME_PACKS = [PACK_STROKES, PACK_ANTONYMS, PACK_MEASURE, PACK_STRUCTURE];
 
 /* ═══════════════════════════════════════════════════════════════
    STATE
