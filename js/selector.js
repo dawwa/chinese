@@ -1,7 +1,10 @@
 /* ═══════════════════════════════════════════════════════════════
    GAME SELECTOR + HELP
 ═══════════════════════════════════════════════════════════════ */
+let selectorPackIdx = 0;  // highlighted pack; "Start Playing" launches it
+
 function openSelector() {
+  selectorPackIdx = currentPackIdx;
   const list = document.getElementById('pack-list');
   list.innerHTML = '';
   GAME_PACKS.forEach((pack, idx) => {
@@ -43,6 +46,8 @@ function openSelector() {
     });
 
     item.addEventListener('click', () => {
+      selectorPackIdx = idx;
+      document.querySelectorAll('.pack-item').forEach(el => el.classList.toggle('active-pack', el === item));
       // Toggle this pack's level grid; close others
       const wasOpen = grid.classList.contains('open');
       document.querySelectorAll('.level-chip-grid').forEach(g => g.classList.remove('open'));
@@ -58,6 +63,11 @@ function openSelector() {
 
 function closeSelector() {
   document.getElementById('selector-overlay').classList.remove('show');
+}
+
+function startSelectedPack() {
+  if (selectorPackIdx === currentPackIdx) closeSelector();
+  else loadPack(selectorPackIdx, 0);
 }
 
 function loadPack(idx, levelIdx = 0) {
