@@ -14,6 +14,21 @@ function buildCardInner(cardData) {
   return parts.join('');
 }
 
+// Identical right cards (e.g. pattern "AA") are shown once and accept several left cards.
+function buildRightCards() {
+  const idxByKey = new Map();
+  currentRights = [];
+  pairRight = currentPairs.map(({ right }) => {
+    const key = `${right.pinyin}|${right.chinese}|${right.img}`;
+    if (!idxByKey.has(key)) { idxByKey.set(key, currentRights.length); currentRights.push(right); }
+    return idxByKey.get(key);
+  });
+}
+
+function isRightDone(rightIdx) {
+  return pairRight.every((r, i) => r !== rightIdx || connections[i] !== undefined);
+}
+
 function renderColumns() {
   const colL = document.getElementById('col-left');
   const colR = document.getElementById('col-right');
@@ -34,17 +49,16 @@ function renderColumns() {
     colL.appendChild(card);
   });
 
-  rightOrder.forEach(pairIdx => {
-    const pair = currentPairs[pairIdx];
+  rightOrder.forEach(rightIdx => {
     const card = document.createElement('div');
     card.className = 'match-card right-card';
-    card.dataset.pairIdx = pairIdx;
+    card.dataset.pairIdx = rightIdx;
     card.innerHTML = `
       <div class="card-row">
-        <div class="dot-left" id="dot-right-${pairIdx}"></div>
-        <div class="card-content">${buildCardInner(pair.right)}</div>
+        <div class="dot-left" id="dot-right-${rightIdx}"></div>
+        <div class="card-content">${buildCardInner(currentRights[rightIdx])}</div>
       </div>`;
-    card.addEventListener('pointerdown', e => onRightDown(e, pairIdx));
+    card.addEventListener('pointerdown', e => onRightDown(e, rightIdx));
     colR.appendChild(card);
   });
 }
@@ -79,7 +93,7 @@ function onLeftDown(e, pairIdx) {
     const rightPairIdx = selectedRight;
     clearRightSelection();
     removeDrawingLine();
-    attemptConnect(pairIdx, rightPairIdx, pairIdx === rightPairIdx);
+    attemptConnect(pairIdx, rightPairIdx, pairRight[pairIdx] === rightPairIdx);
     return;
   }
 
@@ -123,11 +137,11 @@ function onLeftDown(e, pairIdx) {
 
     if (rightCard && selectedLeft !== null) {
       const rightPairIdx = parseInt(rightCard.dataset.pairIdx);
-      if (connections[rightPairIdx] === undefined) {
+      if (!isRightDone(rightPairIdx)) {
         const leftPairIdx = selectedLeft;
         clearLeftSelection();
         removeDrawingLine();
-        attemptConnect(leftPairIdx, rightPairIdx, leftPairIdx === rightPairIdx);
+        attemptConnect(leftPairIdx, rightPairIdx, pairRight[leftPairIdx] === rightPairIdx);
         return;
       }
     }
@@ -143,14 +157,14 @@ function onLeftDown(e, pairIdx) {
 /* ── Interaction: right card (tap-tap mode) ── */
 function onRightDown(e, rightPairIdx) {
   e.preventDefault();
-  if (connections[rightPairIdx] !== undefined) return;
+  if (isRightDone(rightPairIdx)) return;
 
   // Complete a left→right tap-tap connection
   if (selectedLeft !== null) {
     const leftPairIdx = selectedLeft;
     clearLeftSelection();
     removeDrawingLine();
-    attemptConnect(leftPairIdx, rightPairIdx, leftPairIdx === rightPairIdx);
+    attemptConnect(leftPairIdx, rightPairIdx, pairRight[leftPairIdx] === rightPairIdx);
     return;
   }
 
@@ -199,7 +213,7 @@ function onRightDown(e, rightPairIdx) {
         const rPairIdx = selectedRight;
         clearRightSelection();
         removeDrawingLine();
-        attemptConnect(leftPairIdx, rightPairIdx, leftPairIdx === rPairIdx);
+        attemptConnect(leftPairIdx, rightPairIdx, pairRight[leftPairIdx] === rPairIdx);
         return;
       }
     }
@@ -250,7 +264,7 @@ function attemptConnect(leftPairIdx, rightPairIdx, correct) {
       spawnCoins(wr.left + p1.x, wr.top + p1.y, wr.left + p2.x, wr.top + p2.y, celebEmoji);
     }
     document.querySelector(`.left-card[data-pair-idx="${leftPairIdx}"]`).classList.add('matched');
-    document.querySelector(`.right-card[data-pair-idx="${rightPairIdx}"]`).classList.add('matched');
+    if (isRightDone(rightPairIdx)) document.querySelector(`.right-card[data-pair-idx="${rightPairIdx}"]`).classList.add('matched');
     showFeedback(true, currentPairs[leftPairIdx], elapsedMs);
     playCorrect();
     updateScoreboard();

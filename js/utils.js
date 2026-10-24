@@ -4,8 +4,10 @@
 let currentPackIdx  = 0;
 let currentLevel    = 0;
 let currentPairs    = [];   // pairs for this level (in original order)
+let currentRights   = [];   // unique right cards for this level
+let pairRight       = [];   // pair index -> index into currentRights
 let leftOrder       = [];   // shuffled indices into currentPairs
-let rightOrder      = [];   // shuffled indices into currentPairs
+let rightOrder      = [];   // shuffled indices into currentRights
 let selectedLeft    = null; // pair index selected on the left
 let selectedRight   = null; // pair index selected on the right
 let connections     = {};   // leftIdx -> rightIdx (matched pairs)

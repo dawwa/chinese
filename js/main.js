@@ -29,8 +29,9 @@ function buildRound() {
   if (roundInfo) roundInfo.style.display = '';
 
   currentPairs = level.pairs;
+  buildRightCards();
   leftOrder    = shuffle([...Array(currentPairs.length).keys()]);
-  rightOrder   = shuffle([...Array(currentPairs.length).keys()]);
+  rightOrder   = shuffle([...Array(currentRights.length).keys()]);
   connections  = {};
   wrongPairs   = new Set();
   levelWrong   = 0;
@@ -106,7 +107,7 @@ function nextLevel() {
 function retryLevel() {
   clearSVG();
   leftOrder    = shuffle([...Array(currentPairs.length).keys()]);
-  rightOrder   = shuffle([...Array(currentPairs.length).keys()]);
+  rightOrder   = shuffle([...Array(currentRights.length).keys()]);
   connections  = {};
   wrongPairs   = new Set();
   levelWrong   = 0;

@@ -187,11 +187,154 @@ const PACK_ANTONYMS = {
         { left: card(null,        '睁开'), right: card(null,        '闭上') },
       ]
     },
+    {
+      id: 7, cls: 'lv7',
+      label:      '⭐⭐⭐⭐⭐⭐⭐ Level 7 — More Opposites 更多反义词（一）',
+      shortLabel: '⭐⭐⭐⭐⭐⭐⭐ Level 7',
+      pairs: [
+        { left: card(null, '年老'), right: card(null,      '年轻')  },
+        { left: card(null, '静'),   right: card(null,      '动/闹') },
+        { left: card(null, '永远'), right: card('zàn shí', '暂时')  },
+        { left: card(null, '死'),   right: card('huó',     '活')    },
+        { left: card(null, '舒服'), right: card(null,      '难受')  },
+        { left: card(null, '来'),   right: card(null,      '回/去') },
+        { left: card(null, '始'),   right: card('zhōng',   '终')    },
+        { left: card(null, '软'),   right: card('yìng',    '硬')    },
+      ]
+    },
+    {
+      id: 8, cls: 'lv8',
+      label:      '⭐⭐⭐⭐⭐⭐⭐⭐ Level 8 — More Opposites 更多反义词（二）',
+      shortLabel: '⭐⭐⭐⭐⭐⭐⭐⭐ Level 8',
+      pairs: [
+        { left: card(null,   '输'),   right: card('yíng', '赢')   },
+        { left: card(null,   '举'),   right: card(null,   '放')   },
+        { left: card(null,   '同意'), right: card('fǎn duì', '反对') },
+        { left: card(null,   '借'),   right: card('huán', '还')   },
+        { left: card('gān',  '干'),   right: card('shī',  '湿')   },
+        { left: card('shú',  '熟'),   right: card(null,   '生')   },
+        { left: card('zhǎi', '窄'),   right: card('kuān', '宽')   },
+        { left: card('jiāo', '教'),   right: card(null,   '学')   },
+      ]
+    },
   ]
 };
 
 /* ═══════════════════════════════════════════════════════════════
-   PACK 3 — Measure Words 量词
+   PACK 3 — Synonyms 近义词
+═══════════════════════════════════════════════════════════════ */
+const PACK_SYNONYMS = {
+  id: 'synonyms',
+  icon: '🤝',
+  name: 'Synonyms',
+  nameCN: '近义词',
+  desc: 'Match each word with one that means the same',
+  attribution: null,
+  levels: [
+    {
+      id: 1, cls: 'lv1',
+      label:      '⭐ Level 1 — Synonyms 近义词（一）',
+      shortLabel: '⭐ Level 1',
+      pairs: [
+        { left: card(null,      '连忙'), right: card(null,           '赶忙/马上/赶快') },
+        { left: card(null,      '愉快'), right: card(null,           '快乐/欢乐/高兴') },
+        { left: card(null,      '摇'),   right: card(null,           '摆')            },
+        { left: card(null,      '老是'), right: card(null,           '总是')          },
+        { left: card('hài sào', '害臊'), right: card('nán wéi qíng', '难为情')        },
+        { left: card(null,      '丢'),   right: card(null,           '扔')            },
+        { left: card(null,      '仍然'), right: card(null,           '仍旧')          },
+        { left: card(null,      '同样'), right: card(null,           '一样')          },
+      ]
+    },
+    {
+      id: 2, cls: 'lv2',
+      label:      '⭐⭐ Level 2 — Synonyms 近义词（二）',
+      shortLabel: '⭐⭐ Level 2',
+      pairs: [
+        { left: card(null,    '漂亮'), right: card(null,  '美丽/好看') },
+        { left: card(null,    '非常'), right: card(null,  '十分')      },
+        { left: card(null,    '突然'), right: card(null,  '忽然')      },
+        { left: card('bèng',  '蹦'),   right: card(null,  '跳')        },
+        { left: card(null,    '可是'), right: card(null,  '但是')      },
+        { left: card('jiàng', '降'),   right: card('luò', '落')        },
+        { left: card(null,    '如果'), right: card(null,  '假如/要是') },
+      ]
+    },
+  ]
+};
+
+/* ═══════════════════════════════════════════════════════════════
+   PACK 4 — Reduplicated Words 重叠词
+═══════════════════════════════════════════════════════════════ */
+const PACK_REDUPLICATION = {
+  id: 'reduplication',
+  icon: '🔁',
+  name: 'Reduplicated Words',
+  nameCN: '重叠词',
+  desc: 'Link each word to its pattern (words ending in 的/地 count as AA)',
+  attribution: null,
+  levels: [
+    {
+      id: 1, cls: 'lv1',
+      label:      '⭐ Level 1 — Reduplicated Words 重叠词（一）',
+      shortLabel: '⭐ Level 1',
+      pairs: [
+        { left: card(null, '蓝蓝的'),   right: card(null, 'AA')   },
+        { left: card(null, '悄悄地'),   right: card(null, 'AA')   },
+        { left: card(null, '哈哈笑'),   right: card(null, 'AAB')  },
+        { left: card(null, '毛毛雨'),   right: card(null, 'AAB')  },
+        { left: card(null, '笑哈哈'),   right: card(null, 'ABB')  },
+        { left: card(null, '绿油油'),   right: card(null, 'ABB')  },
+        { left: card(null, '许许多多'), right: card(null, 'AABB') },
+      ]
+    },
+    {
+      id: 2, cls: 'lv2',
+      label:      '⭐⭐ Level 2 — Reduplicated Words 重叠词（二）',
+      shortLabel: '⭐⭐ Level 2',
+      pairs: [
+        { left: card(null,           '软软的'),   right: card(null, 'AA')   },
+        { left: card(null,           '轻轻地'),   right: card(null, 'AA')   },
+        { left: card(null,           '哇哇哭'),   right: card(null, 'AAB')  },
+        { left: card(null,           '胖乎乎'),   right: card(null, 'ABB')  },
+        { left: card('suān liū liū', '酸溜溜'),   right: card(null, 'ABB')  },
+        { left: card(null,           '干干净净'), right: card(null, 'AABB') },
+        { left: card('zǐ zǐ xì xì',  '仔仔细细'), right: card(null, 'AABB') },
+      ]
+    },
+    {
+      id: 3, cls: 'lv3',
+      label:      '⭐⭐⭐ Level 3 — Reduplicated Words 重叠词（三）',
+      shortLabel: '⭐⭐⭐ Level 3',
+      pairs: [
+        { left: card(null, '甜甜的'),   right: card(null, 'AA')   },
+        { left: card(null, '慢慢地'),   right: card(null, 'AA')   },
+        { left: card(null, '飘飘然'),   right: card(null, 'AAB')  },
+        { left: card(null, '轻飘飘'),   right: card(null, 'ABB')  },
+        { left: card(null, '汗淋淋'),   right: card(null, 'ABB')  },
+        { left: card(null, '高高兴兴'), right: card(null, 'AABB') },
+        { left: card(null, '老高老高'), right: card(null, 'ABAB') },
+      ]
+    },
+    {
+      id: 4, cls: 'lv4',
+      label:      '⭐⭐⭐⭐ Level 4 — Reduplicated Words 重叠词（四）',
+      shortLabel: '⭐⭐⭐⭐ Level 4',
+      pairs: [
+        { left: card(null,         '深深的'),   right: card(null, 'AA')   },
+        { left: card(null,         '牢牢地'),   right: card(null, 'AA')   },
+        { left: card('gē gē xiào', '咯咯笑'),   right: card(null, 'AAB')  },
+        { left: card(null,         '眼睁睁'),   right: card(null, 'ABB')  },
+        { left: card(null,         '摇摇摆摆'), right: card(null, 'AABB') },
+        { left: card(null,         '热热闹闹'), right: card(null, 'AABB') },
+        { left: card(null,         '好大好大'), right: card(null, 'ABAB') },
+      ]
+    },
+  ]
+};
+
+/* ═══════════════════════════════════════════════════════════════
+   PACK 5 — Measure Words 量词
 ═══════════════════════════════════════════════════════════════ */
 const PACK_MEASURE = {
   id: 'measure',
@@ -407,7 +550,7 @@ const PACK_MEASURE = {
 };
 
 /* ═══════════════════════════════════════════════════════════════
-   PACK 4 — Character Structure 汉字结构
+   PACK 6 — Character Structure 汉字结构
 ═══════════════════════════════════════════════════════════════ */
 const PACK_STRUCTURE = {
   id: 'structure',
@@ -552,7 +695,7 @@ const PACK_STRUCTURE = {
 };
 
 /* ═══════════════════════════════════════════════════════════════
-   PACK 5 — Radicals 偏旁部首 (display-only, parent-led)
+   PACK 7 — Radicals 偏旁部首 (display-only, parent-led)
 ═══════════════════════════════════════════════════════════════ */
 const PACK_RADICALS = {
   id: 'radicals',
@@ -748,4 +891,4 @@ const PACK_RADICALS = {
 };
 
 /* ── Master pack registry ── */
-const GAME_PACKS = [PACK_STROKES, PACK_ANTONYMS, PACK_MEASURE, PACK_STRUCTURE, PACK_RADICALS];
+const GAME_PACKS = [PACK_STROKES, PACK_ANTONYMS, PACK_SYNONYMS, PACK_REDUPLICATION, PACK_MEASURE, PACK_STRUCTURE, PACK_RADICALS];
