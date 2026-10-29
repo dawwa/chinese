@@ -395,6 +395,7 @@ function showRoundComplete() {
   bar.style.display = '';
 
   const btn = document.getElementById('co-btn');
+  document.getElementById('co-btn-alt').style.display = 'none';
   if (isLast) {
     btn.textContent = '🔄 Play Again';
     btn.onclick = resetAll;

@@ -5,6 +5,18 @@ function buildRound() {
   const pack  = GAME_PACKS[currentPackIdx];
   const level = pack.levels[currentLevel];
 
+  if (pack.type === 'flashcard') {
+    document.getElementById('columns').style.display = 'none';
+    document.getElementById('line-canvas').style.display = 'none';
+    document.getElementById('radical-stage').classList.remove('show');
+    document.getElementById('flash-stage').classList.add('show');
+    stopTick();
+    fcStartRound();
+    updateAttribution();
+    return;
+  }
+  document.getElementById('flash-stage').classList.remove('show');
+
   // Display-mode pack (e.g., radicals): swap UI and short-circuit matching logic
   if (pack.type === 'display') {
     document.getElementById('columns').style.display = 'none';
@@ -54,12 +66,13 @@ function buildRound() {
 
 /* ── Scoreboard / header info ── */
 function updateScoreboard() {
+  const pack        = GAME_PACKS[currentPackIdx];
+  if (pack.type === 'flashcard') { fcUpdateScore(); return; }
   const matched = Object.keys(connections).length;
   document.getElementById('score-correct').textContent = matched;
   document.getElementById('score-total').textContent   = currentPairs.length;
   document.getElementById('score-wrong').textContent   = levelWrong;
 
-  const pack        = GAME_PACKS[currentPackIdx];
   if (pack.type === 'display') {
     document.getElementById('progress-bar').style.width = '0%';
     return;
@@ -75,7 +88,8 @@ function updateLevelBadge() {
   const lv    = pack.levels[currentLevel];
   const total = pack.levels.length;
   const badge = document.getElementById('level-badge');
-  badge.textContent = `${lv.shortLabel} of ${total}`;
+  badge.textContent = pack.type !== 'flashcard' ? `${lv.shortLabel} of ${total}`
+    : fcSpecialDeck ? fcSpecialDeck.title : lv.shortLabel;
   badge.className   = `level-badge ${lv.cls}`;
 }
 
@@ -105,6 +119,7 @@ function nextLevel() {
 }
 
 function retryLevel() {
+  if (GAME_PACKS[currentPackIdx].type === 'flashcard') { fcRestart(); return; }
   clearSVG();
   leftOrder    = shuffle([...Array(currentPairs.length).keys()]);
   rightOrder   = shuffle([...Array(currentRights.length).keys()]);
@@ -127,6 +142,7 @@ function retryLevel() {
 function resetAll() {
   document.getElementById('complete-overlay').classList.remove('show');
   stopTick();
+  if (GAME_PACKS[currentPackIdx].type === 'flashcard') { fcRestart(); return; }
   currentLevel = 0;
   levelWrong   = 0;
   buildRound();

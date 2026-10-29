@@ -10,7 +10,7 @@
      nameCN    : string          — display name (ZH)
      desc      : string          — short description
      attribution: string|null    — HTML string shown in footer (null = hide)
-     type      : 'display'|undef — undef = matching engine; 'display' = radicals engine
+     type      : undef = matching engine; 'display' = radicals engine; 'flashcard' = 生字字卡 engine
      levels: Array of Level {
        id         : number
        label      : string       — full label shown in round-info
@@ -18,6 +18,7 @@
        cls        : 'lv1'|'lv2'|'lv3'…
        pairs      : Array of Pair { left: CardData, right: CardData }     (matching)
        items      : Array of { char, pinyin, nameCN, examples[] }         (display)
+       cards      : Array of [char, pinyin, words]                        (flashcard)
      }
    }
 
@@ -890,5 +891,28 @@ const PACK_RADICALS = {
   ],
 };
 
+/* ═══════════════════════════════════════════════════════════════
+   PACK 8 — Character Flash Cards 生字字卡 (flashcard engine)
+   One level per textbook unit, in book order; cards come from hanzi-cards.js.
+═══════════════════════════════════════════════════════════════ */
+const PACK_HANZI = {
+  id: 'hanzi',
+  icon: '📇',
+  name: 'Flash Cards',
+  nameCN: '生字字卡',
+  desc: 'Read the new characters of each textbook unit, then check the pinyin and words',
+  type: 'flashcard',
+  attribution: null,
+  levels: HANZI_BOOKS.flatMap((book, b) => book.units.map((cards, u) => {
+    const unit = `第${['一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '十一', '十二'][u]}单元`;
+    return {
+      id: u + 1, cls: `lv${Math.floor(b / 2) + 1}`,
+      book: b, bookName: book.name, unit,
+      label: `${book.name} ${unit}`, shortLabel: `${book.name} · ${unit}`,
+      cards,
+    };
+  })),
+};
+
 /* ── Master pack registry ── */
-const GAME_PACKS = [PACK_STROKES, PACK_ANTONYMS, PACK_SYNONYMS, PACK_REDUPLICATION, PACK_MEASURE, PACK_STRUCTURE, PACK_RADICALS];
+const GAME_PACKS = [PACK_STROKES, PACK_ANTONYMS, PACK_SYNONYMS, PACK_REDUPLICATION, PACK_MEASURE, PACK_STRUCTURE, PACK_RADICALS, PACK_HANZI];

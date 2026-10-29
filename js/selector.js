@@ -14,19 +14,22 @@ function openSelector() {
 
     const item = document.createElement('div');
     item.className = 'pack-item' + (isActive ? ' active-pack' : '');
+    const summary = pack.type === 'flashcard' ? fcPackSummary()
+      : `${pack.levels.length} level${pack.levels.length > 1 ? 's' : ''} &nbsp;·&nbsp;
+          ${pack.levels.reduce((s, l) => s + (l.pairs ? l.pairs.length : (l.items ? l.items.length : 0)), 0)} ${pack.type === 'display' ? 'items' : 'pairs'} total`;
     item.innerHTML = `
       <div class="pack-icon">${pack.icon}</div>
       <div class="pack-info">
         <div class="pack-name">${pack.nameCN} &nbsp; ${pack.name}</div>
         <div class="pack-desc">${pack.desc}</div>
-        <div class="pack-levels">${pack.levels.length} level${pack.levels.length > 1 ? 's' : ''} &nbsp;·&nbsp;
-          ${pack.levels.reduce((s, l) => s + (l.pairs ? l.pairs.length : (l.items ? l.items.length : 0)), 0)} ${pack.type === 'display' ? 'items' : 'pairs'} total</div>
-        <div class="pack-expand-hint">Tap to choose a level ▾</div>
+        <div class="pack-levels">${summary}</div>
+        <div class="pack-expand-hint">${pack.type === 'flashcard' ? 'Tap to choose a book &amp; unit ▾' : 'Tap to choose a level ▾'}</div>
       </div>`;
 
     const grid = document.createElement('div');
     grid.className = 'level-chip-grid' + (isActive ? ' open' : '');
-    pack.levels.forEach((lvl, lvlIdx) => {
+    if (pack.type === 'flashcard') fcBuildSelectorGrid(grid, idx);
+    else pack.levels.forEach((lvl, lvlIdx) => {
       const chip = document.createElement('button');
       chip.type = 'button';
       chip.className = 'level-chip'
@@ -67,13 +70,15 @@ function closeSelector() {
 
 function startSelectedPack() {
   if (selectorPackIdx === currentPackIdx) closeSelector();
-  else loadPack(selectorPackIdx, 0);
+  else loadPack(selectorPackIdx, GAME_PACKS[selectorPackIdx].type === 'flashcard' ? fcStore.lastLevel : 0);
 }
 
-function loadPack(idx, levelIdx = 0) {
+function loadPack(idx, levelIdx = 0, deck = null) {
   // Stop any in-progress radical animation/sound from a previous pack
   radicalLoopActive = false;
   radicalWriter = null;
+  fcStop();
+  fcSpecialDeck = deck;
   currentPackIdx = idx;
   const pack = GAME_PACKS[idx];
   currentLevel   = Math.max(0, Math.min(levelIdx, pack.levels.length - 1));
@@ -116,6 +121,7 @@ function _menuOutsideClose(e) {
 }
 
 function toggleHelp() {
+  if (GAME_PACKS[currentPackIdx].type === 'flashcard') { alert(FC_HELP); return; }
   alert(
     '📖 HOW TO PLAY\n\n' +
     '1. Tap / click an item on the LEFT side.\n' +

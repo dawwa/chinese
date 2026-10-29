@@ -442,6 +442,139 @@ header h1 {
   border: 2px solid rgba(255,255,255,.85);
 }
 
+/* ── Flash card stage (生字字卡, flashcard pack) ── */
+.flash-stage {
+  width: 100%; height: 100%;
+  display: none; flex-direction: column; align-items: center;
+  justify-content: center; justify-content: safe center;
+  gap: 8px; padding: 6px; position: relative; z-index: 2; overflow-y: auto;
+}
+.flash-stage.show { display: flex; }
+.flash-bar { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; }
+.flash-modes {
+  display: flex; gap: 2px; padding: 3px; border-radius: 50px;
+  background: rgba(255,255,255,.7); border: 2px solid rgba(255,255,255,.85);
+}
+.flash-mode {
+  border: none; background: transparent; cursor: pointer;
+  padding: 5px 14px; border-radius: 50px;
+  font-family: var(--font-en); font-size: .85rem; font-weight: 900; color: #7a4500;
+}
+.flash-mode.active { background: var(--sw-orange); color: #fff; box-shadow: 0 2px 6px rgba(0,0,0,.15); }
+.flash-select {
+  padding: 6px 10px; border-radius: 50px; cursor: pointer;
+  border: 2px solid rgba(255,255,255,.85); background: rgba(255,255,255,.85);
+  font-family: var(--font-en); font-size: .82rem; font-weight: 800; color: #4a2c00;
+}
+.flash-select:disabled { opacity: .5; cursor: default; }
+.flash-icon-btn {
+  width: 36px; height: 36px; border-radius: 50%; cursor: pointer;
+  border: 2px solid rgba(255,255,255,.85); background: rgba(255,255,255,.55);
+  font-size: 1rem; opacity: .55;
+}
+.flash-icon-btn.active { opacity: 1; background: #fff; border-color: var(--sw-blue); }
+.flash-card {
+  position: relative; width: min(440px, 96%);
+  background: var(--card-bg); border-radius: 24px;
+  border: 4px solid var(--sw-orange); box-shadow: var(--shadow);
+  padding: 8px 16px 12px;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+.flash-card.fc-in { animation: fcIn .28s cubic-bezier(.22,.68,0,1.2); }
+@keyframes fcIn { from { transform: translateX(18px) scale(.97); opacity: .4; } to { transform: none; opacity: 1; } }
+.flash-meta {
+  width: 100%; min-height: 18px;
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: .8rem; font-weight: 800; color: #7a4500;
+}
+.flash-pinyin, .flash-words {
+  position: relative; width: 100%; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  padding: 2px 40px;
+}
+.flash-pinyin { min-height: 46px; }
+.flash-words  { min-height: 50px; }
+.flash-pinyin-text {
+  font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+  font-size: clamp(1.4rem, 3.8vh, 2.2rem); font-weight: 700; color: #0a7fa3; letter-spacing: .04em;
+}
+.flash-placeholder {
+  display: none; position: relative; overflow: hidden;
+  font-family: var(--font-zh); font-size: 1rem; font-weight: 700; color: #a87245;
+  background: repeating-linear-gradient(45deg, #fff7e6, #fff7e6 6px, #ffe7cf 6px, #ffe7cf 12px);
+  padding: 8px 22px; border-radius: 14px; border: 2px dashed var(--sw-blue);
+  letter-spacing: .1em;
+}
+.flash-pinyin.hidden .flash-placeholder, .flash-words.hidden .flash-placeholder { display: block; }
+.flash-pinyin.hidden .flash-pinyin-text, .flash-words.hidden .flash-words-list { display: none; }
+.flash-timer {
+  position: absolute; left: 0; bottom: 0; width: 100%; height: 4px;
+  background: var(--sw-blue); transform: scaleX(0); transform-origin: left;
+}
+@keyframes fcPinyinTimer { to { transform: scaleX(1); } }
+.flash-char-box {
+  width: clamp(140px, 30vh, 250px); height: clamp(140px, 30vh, 250px);
+  background: #FFFAF3; border: 2px dashed #f4845f; border-radius: 16px;
+  position: relative; display: flex; align-items: center; justify-content: center;
+}
+/* 田字格 cross guide, as in the radicals stage */
+.flash-char-box::before, .flash-char-box::after {
+  content: ''; position: absolute; background: #f4845f33; pointer-events: none;
+}
+.flash-char-box::before { left: 50%; top: 6%; bottom: 6%; width: 1px; }
+.flash-char-box::after  { top: 50%; left: 6%; right: 6%; height: 1px; }
+.flash-char {
+  position: relative; z-index: 1; line-height: 1; color: #1a1a1a;
+  font-family: 'KaiTi', 'STKaiti', 'Kaiti SC', var(--font-zh);
+  font-size: clamp(100px, 23vh, 190px);
+}
+.flash-words-list { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.flash-word {
+  font-family: var(--font-zh); font-size: clamp(1.05rem, 2.6vh, 1.5rem); font-weight: 700; color: #2c1000;
+  background: linear-gradient(135deg, #fff7e6, #ffe7cf);
+  padding: 3px 12px; border-radius: 12px; border: 2px solid var(--sw-blue);
+}
+.flash-speak {
+  position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+  width: 44px; height: 44px; border-radius: 50%; cursor: pointer;
+  border: 3px solid var(--sw-blue); background: #fff; font-size: 1.25rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,.15);
+}
+.flash-speak:active { transform: translateY(-50%) scale(.92); }
+.flash-answer { display: flex; gap: 10px; align-items: center; justify-content: center; }
+.flash-answer .btn { font-size: 1.05rem; padding: 10px 22px; }
+.flash-answer .flash-undo { padding: 10px 14px; }
+.flash-undo:disabled { opacity: .4; cursor: default; }
+.flash-again { background: var(--sw-orange); color: #fff; }
+.flash-know  { background: var(--correct); color: #fff; }
+.flash-choices {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; width: min(440px, 96%);
+}
+.flash-choice {
+  position: relative; padding: 10px 8px; border-radius: 16px; cursor: pointer;
+  border: 3px solid #E0E0F0; background: #fff; box-shadow: 0 3px 0 rgba(0,0,0,.12);
+  font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+  font-size: clamp(1.2rem, 3.2vh, 1.7rem); font-weight: 700; color: #0a7fa3;
+}
+.flash-choice::before {
+  content: attr(data-key); position: absolute; left: 10px; top: 6px;
+  font-size: .7rem; font-weight: 800; color: #bbb;
+}
+.flash-choice:hover:not(:disabled) { border-color: var(--sw-blue); }
+.flash-choice:disabled { cursor: default; }
+.flash-choice.correct { border-color: var(--correct); background: #e8fff0; color: #1e8a35; }
+.flash-choice.wrong   { border-color: var(--wrong); background: #ffecec; color: var(--wrong); animation: shake .35s; }
+.flash-strip { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; max-width: min(520px, 96%); }
+.fc-chip {
+  width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-zh); font-size: 1rem; color: #4a2c00;
+  background: rgba(255,255,255,.75); border: 2px solid rgba(255,255,255,.95); border-radius: 8px;
+}
+.fc-chip.known   { background: #d6f5dc; border-color: var(--correct); }
+.fc-chip.learned { background: #fff1c9; border-color: #f0b400; }
+.fc-chip.again   { background: #ffe1e1; border-color: #f08080; }
+.fc-chip.current { outline: 3px solid var(--sw-blue); outline-offset: 1px; }
+
 /* ── Feedback popup ── */
 .feedback {
   position: fixed; top: 50%; left: 50%;
@@ -506,6 +639,7 @@ header h1 {
   font-family: var(--font-zh); font-weight: 900;
 }
 .complete-box .stats { font-size: .95rem; color: #7a4500; margin-bottom: 16px; font-weight: 700; }
+.complete-box .btn + .btn { margin-left: 8px; }
 .stars { font-size: 2rem; margin-bottom: 6px; letter-spacing: 4px; }
 
 /* ── Game Selector overlay ── */
@@ -576,6 +710,17 @@ header h1 {
 .level-chip.active-level { border-color: var(--correct); background: #e8fff0; }
 .level-chip .chip-stars { display: block; font-size: .85rem; letter-spacing: 1px; margin-bottom: 2px; }
 .level-chip .chip-name  { display: block; font-size: .72rem; color: #666; font-weight: 700; }
+.fc-book-select {
+  grid-column: 1 / -1;
+  padding: 8px 12px; border-radius: 12px; border: 2px solid #E0E0F0; background: #fff;
+  font-family: var(--font-en); font-size: .9rem; font-weight: 800; color: #4a2c00; cursor: pointer;
+}
+.level-chip .chip-preview {
+  display: block; font-family: var(--font-zh); font-size: .78rem; color: #a0522d;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.level-chip.chip-special { background: #fff7e6; }
+.level-chip:disabled { opacity: .5; cursor: default; transform: none; }
 .selector-close {
   margin-top: 18px; width: 100%; padding: 13px; border: none;
   border-radius: 50px; background: var(--sw-red); color: #fff;
@@ -704,5 +849,13 @@ header h1 {
   .progress-wrap { height: 6px; }
   header h1    { font-size: clamp(.78rem, 3vw, 1rem); white-space: normal; }
   .complete-box { padding: 18px 16px; border-radius: 20px; }
+  .flash-stage  { gap: 6px; padding: 4px; }
+  .flash-card   { padding: 6px 10px 10px; border-width: 3px; }
+  .flash-char-box { width: clamp(130px, 26vh, 210px); height: clamp(130px, 26vh, 210px); }
+  .flash-char   { font-size: clamp(92px, 20vh, 160px); }
+  .flash-answer .btn { padding: 9px 16px; font-size: .95rem; }
+  .flash-mode   { padding: 4px 10px; font-size: .78rem; }
+  .flash-select { padding: 5px 8px; font-size: .75rem; }
+  .fc-chip      { width: 26px; height: 26px; font-size: .9rem; }
   .selector-box { padding: 16px 12px; }
 }

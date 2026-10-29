@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Noto+Serif+SC:wght@700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css?v=8" />
+  <link rel="stylesheet" href="css/styles.css?v=9" />
   <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 </head>
 <body>
@@ -89,6 +89,45 @@
       <button class="btn btn-primary" onclick="radicalNext()">Next ▶</button>
     </div>
   </div>
+  <div class="flash-stage" id="flash-stage">
+    <div class="flash-bar">
+      <div class="flash-modes">
+        <button type="button" class="flash-mode" id="fc-mode-read" onclick="fcSetMode('read')">📇 认读</button>
+        <button type="button" class="flash-mode" id="fc-mode-choice" onclick="fcSetMode('choice')">🔤 选拼音</button>
+      </div>
+      <select class="flash-select" id="fc-pinyin-setting" onchange="fcSetPinyinSetting(this.value)" aria-label="拼音显示方式">
+        <option value="tap">拼音：点一下再看</option>
+        <option value="show">拼音：一直显示</option>
+        <option value="1000">拼音：1秒后显示</option>
+        <option value="2000">拼音：2秒后显示</option>
+        <option value="3000">拼音：3秒后显示</option>
+        <option value="5000">拼音：5秒后显示</option>
+      </select>
+      <button type="button" class="flash-icon-btn" id="fc-shuffle" onclick="fcToggleShuffle()" title="随机顺序 Shuffle" aria-label="随机顺序">🔀</button>
+    </div>
+    <div class="flash-card" id="flash-card">
+      <div class="flash-meta"><span id="fc-left"></span><span id="fc-stars" title="答错过的次数"></span></div>
+      <div class="flash-pinyin hidden" id="fc-pinyin" onclick="fcTogglePinyin()">
+        <button class="reveal-icon" id="fc-pinyin-btn" type="button" aria-label="拼音">🙈</button>
+        <div class="flash-placeholder">拼音？<span class="flash-timer" id="fc-pinyin-timer"></span></div>
+        <div class="flash-pinyin-text" id="fc-pinyin-text"></div>
+      </div>
+      <div class="flash-char-box"><div class="flash-char" id="fc-char"></div></div>
+      <div class="flash-words hidden" id="fc-words" onclick="fcToggleWords()">
+        <button class="reveal-icon" id="fc-words-btn" type="button" aria-label="组词">🙈</button>
+        <div class="flash-placeholder">··· 组词 Words ···</div>
+        <div class="flash-words-list" id="fc-words-list"></div>
+      </div>
+      <button type="button" class="flash-speak" onclick="fcSpeak()" title="读一读 (Enter)" aria-label="读一读">🔊</button>
+    </div>
+    <div class="flash-answer" id="fc-answer-read">
+      <button type="button" class="btn btn-neutral flash-undo" id="fc-undo" onclick="fcUndo()" title="上一张 (←)" aria-label="上一张">↩</button>
+      <button type="button" class="btn flash-again" onclick="fcAnswer(false)">🔁 再练</button>
+      <button type="button" class="btn flash-know" onclick="fcAnswer(true)">✅ 认识</button>
+    </div>
+    <div class="flash-choices" id="fc-answer-choice"></div>
+    <div class="flash-strip" id="fc-strip"></div>
+  </div>
 </div>
 
 <footer class="attribution">
@@ -120,6 +159,7 @@
     <h2 id="co-title">太棒了！</h2>
     <div class="stats" id="co-stats"></div>
     <button class="btn btn-primary" id="co-btn" onclick="nextLevel()">▶ Next Level</button>
+    <button class="btn btn-accent" id="co-btn-alt" style="display:none"></button>
   </div>
 </div>
 
@@ -134,13 +174,17 @@
   </div>
 </div>
 
-<!-- App scripts (load order matters: utils → packs → audio → matching → radicals → selector → main) -->
-<script src="js/utils.js?v=10"></script>
-<script src="js/packs.js?v=10"></script>
-<script src="js/audio.js?v=10"></script>
-<script src="js/matching.js?v=10"></script>
-<script src="js/radicals.js?v=10"></script>
-<script src="js/selector.js?v=11"></script>
-<script src="js/main.js?v=10"></script>
+<!-- App scripts (load order matters: utils → hanzi-cards → packs → audio → matching → radicals → flashcards → selector → main) -->
+<script src="js/utils.js?v=12"></script>
+<script src="js/hanzi-cards.js?v=13"></script>
+<!-- optional, git-ignored: full 生字字卡 data that replaces the sample above -->
+<script src="js/hanzi-cards.local.js?v=13"></script>
+<script src="js/packs.js?v=12"></script>
+<script src="js/audio.js?v=12"></script>
+<script src="js/matching.js?v=12"></script>
+<script src="js/radicals.js?v=12"></script>
+<script src="js/flashcards.js?v=12"></script>
+<script src="js/selector.js?v=12"></script>
+<script src="js/main.js?v=12"></script>
 </body>
 </html>
